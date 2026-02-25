@@ -9,11 +9,11 @@ class address extends Model
     //
     protected $fillable = [
         'user_id',
-        'street',
+         'street',
         'city',
-        'state',
-        'postal_code',
-        'country',
+        'building_no',
+        'appartment_no',
+        'phone',
     ];
 
     function user(){
