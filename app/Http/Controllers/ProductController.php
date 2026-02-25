@@ -9,24 +9,25 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine;
 
 class ProductController extends Controller implements HasMiddleware
 {
 
-public static function middleware(): array
-{
-    return [
-        new Middleware('auth:sanctum', except: ['index', 'show']),
-        new Middleware('checkRole:admin', except: ['index', 'show']),
-    ];
-}
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth:sanctum', except: ['index', 'show']),
+            new Middleware('checkRole:admin', except: ['index', 'show']),
+        ];
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $query = product::query();
-         
+
         if (request()->has('category_id')) {
             $query->where('category_id', request()->input('category_id'));
         }
@@ -34,22 +35,22 @@ public static function middleware(): array
         if (request()->has('max_price')) {
             $query->where('price', '<=', request()->input('max_price'));
         }
-        if(request()->has('order_by_price')){
+        if (request()->has('order_by_price')) {
             $query->orderBy('price', request()->input('order_by_price') === 'asc' ? 'asc' : 'desc');
         }
 
-         if (request()->has('min_price')) {
+        if (request()->has('min_price')) {
             $query->where('price', '>=', request()->input('min_price'));
         }
 
-         $query->where('is_active', true);
+        $query->where('is_active', true);
 
-         if (request()->has('search')) {
+        if (request()->has('search')) {
             $query->where('name', 'like', '%' . request()->input('search') . '%');
         }
 
         $products = $query->paginate(15);
-       
+
         return response()->json($products);
     }
 
@@ -58,8 +59,8 @@ public static function middleware(): array
      */
    public function store(Request $request)
 {
-    
-     $validated = $request->validate([
+
+    $validated = $request->validate([
         'name' => 'required|string|max:255',
         'price' => 'required|numeric',
         'stock' => 'required|integer',
@@ -71,40 +72,56 @@ public static function middleware(): array
 
     try {
         DB::beginTransaction();
-        
-        $product = product::create(collect($validated)->except('images')->toArray());
 
+        $product = Product::create(collect($validated)->except('images')->toArray());
+  
+        $cloudinary = new \Cloudinary\Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key' => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+     
         foreach ($request->file('images') as $index => $image) {
-          $uploadedFileUrl = cloudinary()->uploadApi()->upload($image->getRealPath(), [
-    'folder' => 'products'
-])['secure_url'];
+            $result = $cloudinary->uploadApi()->upload($image->getRealPath(), [
+                'folder' => 'products',
+            ]);
+
+ 
+            $uploadedFileUrl = $result['secure_url'] ?? null;
 
             ProductImage::create([
-                'product_id' => $product->id,
                 'url' => $uploadedFileUrl,
                 'is_primary' => $index === 0,
+                'product_id' => $product->id,
             ]);
+
         }
 
         DB::commit();
+
+        $product->load('images'); 
         return response()->json($product, 201);
 
     } catch (\Exception $e) {
-    DB::rollBack();
-    return response()->json([
-        'message' => 'Something went wrong',
-        'error' => $e->getMessage(),
-        'line' => $e->getLine(),
-        'file' => $e->getFile()
-    ], 500);
-}
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Something went wrong',
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+        ], 500);
+    }
 }
     /**
      * Display the specified resource.
      */
     public function show(product $product)
     {
-        return response()->json(['product' => $product , 'images' => $product->images]);
+        return response()->json(['product' => $product, 'images' => $product->images]);
     }
 
     /**
@@ -132,20 +149,19 @@ public static function middleware(): array
     {
         $product->delete();
 
-        return response()->json([ 'message' => 'Product deleted successfully'], 204);
+        return response()->json(['message' => 'Product deleted successfully'], 204);
     }
 
-    
 
-    static function decrease_stock($id, $quantity){
+
+    static function decrease_stock($id, $quantity)
+    {
         $product = product::find($id);
-            if (!$product ) {
-                return response()->json(['message' => 'Product not found'], 404);
-                exit;
-            }
+        if (!$product) {
+            return response()->json(['message' => 'Product not found'], 404);
+            exit;
+        }
         $product->stock -= $quantity;
         $product->save();
     }
-
-    
 }
