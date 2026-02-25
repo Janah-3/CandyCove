@@ -6,6 +6,7 @@ use \App\Http\Controllers\authController;
 use \App\Http\Controllers\ProductController;
 use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
+use \App\Http\Controllers\categoryController;
 use Illuminate\Support\Facades\Cache;
 
 
@@ -43,3 +44,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::put('/orders/{id}', [OrderController::class, 'update']);
 });
+
+// Category routes
+Route::resource('/categories', categoryController::class);
