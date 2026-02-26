@@ -26,7 +26,7 @@ class ProductController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        $query = product::query();
+         $query = Product::with('images');
 
         if (request()->has('category_id')) {
             $query->where('category_id', request()->input('category_id'));

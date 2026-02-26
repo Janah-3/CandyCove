@@ -7,6 +7,7 @@ use \App\Http\Controllers\ProductController;
 use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\categoryController;
+use \App\Http\Controllers\addressController;
 use Illuminate\Support\Facades\Cache;
 
 
@@ -20,6 +21,7 @@ Route::post('/login', [authController::class, 'login']);
 Route::middleware(['auth:sanctum'])->post('/logout', [authController::class, 'logout']);
 Route::post('/forgetPass', [authController::class, 'forgetPass']);
 Route::PUT('/resetPass', [authController::class, 'resetPass']);
+Route::middleware(['auth:sanctum', 'checkRole:admin'])->post('/addAdmin', [authController::class, 'AddAdmin']);
 
 // Product routes
 Route::resource('/products', ProductController::class);
@@ -47,3 +49,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 // Category routes
 Route::resource('/categories', categoryController::class);
+
+//address routes
+Route::middleware(['auth:sanctum','checkRole:customer'])->resource('/addresses', addressController::class);

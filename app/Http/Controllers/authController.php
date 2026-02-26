@@ -121,4 +121,28 @@ return $status === Password::RESET_LINK_SENT ? response()->json(['message' => 'R
     }
 
 
+    function AddAdmin(Request $request){
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:20',
+        ]);
+
+       $user = User::create([ 
+        ...$validated,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'role' => 'admin',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Admin user created successfully',
+        ], 201 ); 
+
+    }
+
 }
