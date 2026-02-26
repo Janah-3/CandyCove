@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
@@ -9,7 +7,7 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller implements HasMiddleware
 {
@@ -25,34 +23,46 @@ class ProductController extends Controller implements HasMiddleware
      * Display a listing of the resource.
      */
     public function index()
-    {
-         $query = Product::with('images');
+{
+    $requestData = request()->query();
+    ksort($requestData);
 
-        if (request()->has('category_id')) {
-            $query->where('category_id', request()->input('category_id'));
+    $cacheKey = 'products:' . md5(json_encode($requestData));
+
+    $products = Cache::remember($cacheKey, 3600, function () {
+
+        $query = Product::with('images', 'category');
+
+        if (request('category_id')) {
+            $query->where('category_id', request('category_id'));
         }
 
-        if (request()->has('max_price')) {
-            $query->where('price', '<=', request()->input('max_price'));
-        }
-        if (request()->has('order_by_price')) {
-            $query->orderBy('price', request()->input('order_by_price') === 'asc' ? 'asc' : 'desc');
+        if (request('min_price')) {
+            $query->where('price', '>=', request('min_price'));
         }
 
-        if (request()->has('min_price')) {
-            $query->where('price', '>=', request()->input('min_price'));
+        if (request('max_price')) {
+            $query->where('price', '<=', request('max_price'));
+        }
+
+        if (request('order_by_price')) {
+            $query->orderBy(
+                'price',
+                request('order_by_price') === 'asc' ? 'asc' : 'desc'
+            );
+        }
+
+        if (request('search')) {
+            $query->where('name', 'like', '%' . request('search') . '%');
         }
 
         $query->where('is_active', true);
 
-        if (request()->has('search')) {
-            $query->where('name', 'like', '%' . request()->input('search') . '%');
-        }
+        return $query->paginate(15);
+    });
 
-        $products = $query->paginate(15);
-
-        return response()->json($products);
-    }
+    return response()->json($products);
+}
 
     /**
      * Store a newly created resource in storage.
@@ -138,6 +148,8 @@ class ProductController extends Controller implements HasMiddleware
         ]);
 
         $product->update($validated);
+
+        
 
         return response()->json($product);
     }

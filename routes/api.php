@@ -8,27 +8,27 @@ use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\categoryController;
 use \App\Http\Controllers\addressController;
-use Illuminate\Support\Facades\Cache;
-
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Authentication routes
-Route::post('/register', [authController::class, 'register']);
-Route::post('/login', [authController::class, 'login']);
+//  Auth routes
+Route::middleware(['throttle:5,1'])->group(function () {
+    Route::post('/login', [authController::class, 'login']);
+    Route::post('/register', [authController::class, 'register']);
+    Route::post('/forgetPass', [authController::class, 'forgetPass']);
+});
+
+Route::put('/resetPass', [authController::class, 'resetPass']);
 Route::middleware(['auth:sanctum'])->post('/logout', [authController::class, 'logout']);
-Route::post('/forgetPass', [authController::class, 'forgetPass']);
-Route::PUT('/resetPass', [authController::class, 'resetPass']);
 Route::middleware(['auth:sanctum', 'checkRole:admin'])->post('/addAdmin', [authController::class, 'AddAdmin']);
 
-// Product routes
-Route::resource('/products', ProductController::class);
-
+//  Product routes 
+Route::apiResource('/products', ProductController::class);
 
 // Cart routes
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->group(function () {
     Route::get('/cart', [CartController::class, 'viewCart']);
     Route::post('/cart', [CartController::class, 'addToCart']);
     Route::delete('/cart/clear', [CartController::class, 'clearCart']);
@@ -37,18 +37,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/cart/increase/{productId}', [CartController::class, 'increaseAmount']);
 });
 
-// Order routes
-Route::middleware(['auth:sanctum'])->resource('/orders', OrderController::class);
-
-Route::middleware(['auth:sanctum'])->group(function () {
+// Order routes 
+Route::middleware(['auth:sanctum', 'throttle:20,1'])->group(function () {
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::middleware(['checkRole:customer'])->post('/orders', [OrderController::class, 'store']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
-    Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/orders/{order}', [OrderController::class, 'show']);
+    Route::put('/orders/{order}', [OrderController::class, 'update']);
 });
 
-// Category routes
-Route::resource('/categories', categoryController::class);
+// Category routes 
+Route::apiResource('/categories', categoryController::class);
 
-//address routes
-Route::middleware(['auth:sanctum','checkRole:customer'])->resource('/addresses', addressController::class);
+//Address routes 
+Route::middleware(['auth:sanctum', 'checkRole:customer'])->apiResource('/addresses', addressController::class);

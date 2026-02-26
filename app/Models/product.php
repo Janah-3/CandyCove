@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class product extends Model
 {
@@ -28,6 +29,17 @@ class product extends Model
     function images(){
         return $this->hasMany(productImage::class);
     }
+
+    protected static function booted()
+{
+    static::saved(function () {
+        Cache::tags(['products'])->flush();
+    });
+
+    static::deleted(function () {
+        Cache::tags(['products'])->flush();
+    });
+}
 
 
 }
