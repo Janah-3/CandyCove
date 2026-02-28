@@ -24,8 +24,8 @@ class OrderController extends Controller
 
         $userRole = request()->user()->role;
 
-
-        $orders = Order::query()->with('user');
+        $orders = Order::query()
+    ->with(['user', 'products', 'products.images']);
 
 
         if (request()->has('status')) {
@@ -100,12 +100,16 @@ class OrderController extends Controller
                     return response()->json(['message' => 'Product not available'], 400);
                 }
                 $products[$productId] = $product;
+                $totalPrice += $product->price * $quantity;
             }
+
 
             $order = order::create([
                 'user_id' => $userId,
                 'address_id' => $address->id,
                 'status' => 'pending',
+                'total_amount' => $totalPrice,
+                'number_of_items' => array_sum($cartItems),
                 'ordered_at' => now(),
             ]);
 
@@ -122,7 +126,6 @@ class OrderController extends Controller
 
                 $product->decrement('stock', $quantity);
 
-                $totalPrice += $product->price * $quantity;
             }
 
 
@@ -152,7 +155,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Forbidden - You do not have permission'], 403);
         }
 
-        $order->load('products', 'address');
+        $order->load('products', 'address','products.images');
         return response()->json($order);
     }
 

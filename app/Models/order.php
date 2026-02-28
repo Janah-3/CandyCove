@@ -14,6 +14,8 @@ class order extends Model
         'address_id',
         'status',
         'ordered_at',
+        'total_amount',
+        'number_of_items',
     ];
 
 

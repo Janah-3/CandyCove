@@ -8,6 +8,10 @@ use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\categoryController;
 use \App\Http\Controllers\addressController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -50,3 +54,9 @@ Route::apiResource('/categories', categoryController::class);
 
 //Address routes 
 Route::middleware(['auth:sanctum', 'checkRole:customer'])->apiResource('/addresses', addressController::class);
+
+Route::get('/email/verify/{id}/{hash}', [authController::class, 'verifyEmail'])
+    ->middleware('signed')
+    ->name('verification.verify');
+
+Route::post('/login/remember', [authController::class, 'loginWithRememberToken']);
