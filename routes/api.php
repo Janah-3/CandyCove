@@ -54,6 +54,7 @@ Route::apiResource('/categories', categoryController::class);
 
 //Address routes 
 Route::middleware(['auth:sanctum', 'checkRole:customer'])->apiResource('/addresses', addressController::class);
+Route::middleware(['auth:sanctum', 'checkRole:customer'])->get('/user/addresses', [addressController::class, 'getUserAddresses']);
 
 Route::get('/email/verify/{id}/{hash}', [authController::class, 'verifyEmail'])
     ->middleware('signed')

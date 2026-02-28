@@ -43,11 +43,11 @@ class addressController extends Controller
         }
 
         $validated = $request->validate([
-            'street' => 'sometimes|required|string|max:255',
-            'city' => 'sometimes|required|string|max:255',
-            'building_no' => 'sometimes|required|string|max:255',
-            'appartment_no' => 'sometimes|required|string|max:255',
-            'phone' => 'sometimes|required|string|max:20',
+            'street' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'building_no' => 'required|string|max:255',
+            'appartment_no' => 'sometimes|string|max:255',
+            'phone' => 'required|string|max:20',
         ]);
 
         $address->update($validated);
@@ -69,6 +69,11 @@ class addressController extends Controller
     }
 
     
+     function getUserAddresses(Request $request){
+        $userId = $request->user()->id;
+        $addresses = address::where('user_id', $userId)->get();
+        return response()->json($addresses);
+     }
 
 
 }
