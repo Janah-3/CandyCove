@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+
+<div class="cursor-outer" id="cursorOuter"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<div class="auth-page">
+
+  <!-- Visual Side -->
+  <div class="auth-visual">
+    <div class="auth-visual-blob auth-visual-blob-1"></div>
+    <div class="auth-visual-blob auth-visual-blob-2"></div>
+    <div class="auth-visual-content">
+      <div style="font-size:64px;margin-bottom:20px;">🍭</div>
+      <div class="auth-visual-title">
+        Welcome<br><em style="font-style:italic;">Back</em>
+      </div>
+      <p class="auth-visual-sub">
+        Sign in and continue your sweet journey with us. Hundreds of treats await.
+      </p>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="auth-form-panel">
+
+    <a href="index.html" class="auth-logo">
+      <div class="nav-logo-mark">C</div>
+      <div>
+        <div class="nav-logo-text">CandyCove</div>
+        <div class="nav-logo-sub">not just candy, but a sweet escape</div>
+      </div>
+    </a>
+
+    <div class="auth-form-title">Sign In</div>
+    <div class="auth-form-sub">
+      Don't have an account?
+      <a href="register.html">Register free</a>
+    </div>
+
+    <!-- Alert Box -->
+    <div id="alertBox"
+         style="display:none;margin-bottom:16px;padding:12px;border-radius:8px;font-size:14px;">
+    </div>
+
+    <div class="form-stack">
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="hello@candycove.com" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="rememberMe"> Remember me
+        </label>
+        <a href="forgot-password.html" style="font-size:13px;">Forgot password?</a>
+      </div>
+
+      <button id="loginBtn" class="btn btn-primary w-full btn-lg" onclick="handleLogin()">
+        Sign In 🍭
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+
+  // ── Helpers for remember token ──
+  function getRememberToken()    { return localStorage.getItem('cc_remember_token'); }
+  function setRememberToken(t)   { localStorage.setItem('cc_remember_token', t); }
+  function removeRememberToken() { localStorage.removeItem('cc_remember_token'); }
+
+  function showAlert(msg, type = 'error') {
+    const box = document.getElementById('alertBox');
+    if (type === 'error') {
+      box.style.background = 'rgba(255,0,0,0.08)';
+      box.style.border     = '1px solid rgba(255,0,0,0.2)';
+      box.style.color      = '#d10000';
+    } else {
+      box.style.background = 'rgba(94,207,191,0.1)';
+      box.style.border     = '1px solid rgba(94,207,191,0.3)';
+      box.style.color      = 'green';
+    }
+    box.textContent    = msg;
+    box.style.display  = 'block';
+  }
+
+  // ── On page load: auto-login with remember token if present ──
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Already logged in
+    if (getToken()) {
+
+  const user = getUser(); // 👈 get stored user
+
+  if (user && user.role === 'admin') {
+    window.location.href = 'admin.html';
+  } else {
+    window.location.href = 'index.html';
+  }
+      return;
+    }
+
+    // Try remember token auto-login
+    const rememberToken = getRememberToken();
+    if (rememberToken) {
+      const btn = document.getElementById('loginBtn');
+      btn.innerHTML = 'Signing you in... 🍭';
+      btn.disabled  = true;
+
+      try {
+        const { ok, data } = await apiFetch('/login/remember', {
+          method: 'POST',
+          body: JSON.stringify({ remember_token: rememberToken })
+        });
+
+        if (ok && data.token) {
+          setToken(data.token);
+          if (data.user) setUser(data.user);
+          // Rotate the stored remember token
+          if (data.remember_token) setRememberToken(data.remember_token);
+         if (data.user && data.user.role === 'admin') {
+  window.location.href = 'admin.html';
+} else {
+  window.location.href = 'index.html';
+}
+          return;
+        } else {
+          // Token expired or invalid — clear it
+          removeRememberToken();
+        }
+      } catch {
+        removeRememberToken();
+      }
+
+      btn.innerHTML = 'Sign In 🍭';
+      btn.disabled  = false;
+    }
+  });
+
+  // ── Handle manual login ──
+  async function handleLogin() {
+    const email      = document.getElementById('email').value.trim();
+    const password   = document.getElementById('password').value;
+    const remember   = document.getElementById('rememberMe').checked;
+    const btn        = document.getElementById('loginBtn');
+
+    document.getElementById('alertBox').style.display = 'none';
+
+    if (!email || !email.includes('@')) {
+      showAlert('Please enter a valid email address.');
+      return;
+    }
+    if (!password) {
+      showAlert('Please enter your password.');
+      return;
+    }
+
+    btn.innerHTML = 'Signing in... 🍭';
+    btn.disabled  = true;
+
+    try {
+      const { ok, data } = await apiFetch('/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, remember })
+      });
+
+      if (ok) {
+        if (data.token)  setToken(data.token);
+        if (data.user)   setUser(data.user);
+
+        // Save remember token if user checked "remember me"
+        if (remember && data.remember_token) {
+          setRememberToken(data.remember_token);
+        } else {
+          removeRememberToken();
+        }
+
+        showAlert('Welcome back! Redirecting... 🍬', 'success');
+        setTimeout(() => {
+
+  if (data.user && data.user.role === 'admin') {
+    window.location.href = 'admin.html';
+  } else {
+    window.location.href = 'index.html';
+  }
+
+}, 1000);
+
+      } else {
+        showAlert(data.message || 'Invalid credentials.');
+        btn.innerHTML = 'Sign In 🍭';
+        btn.disabled  = false;
+      }
+
+    } catch {
+      showAlert('Connection error. Please try again.');
+      btn.innerHTML = 'Sign In 🍭';
+      btn.disabled  = false;
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="cursor-outer" id="cursorOuter"></div>
+<div class="cursor-dot"   id="cursorDot"></div>
+
+<div class="auth-page">
+  <!-- Visual Side -->
+  <div class="auth-visual" style="background:linear-gradient(145deg,var(--teal-deep),var(--teal));">
+    <div class="auth-visual-blob auth-visual-blob-1"></div>
+    <div class="auth-visual-blob auth-visual-blob-2"></div>
+    <div class="auth-visual-content">
+      <div style="font-size:64px;margin-bottom:20px;">🎉</div>
+      <div class="auth-visual-title">Join the<br><em style="font-style:italic;">Sweet</em><br>World</div>
+      <p class="auth-visual-sub">Create your free account and unlock exclusive deals, track your orders, and more.</p>
+      <div class="auth-visual-emojis">
+        <div class="auth-emoji-float">🎁</div>
+        <div class="auth-emoji-float">🍭</div>
+        <div class="auth-emoji-float">⭐</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="auth-form-panel">
+    <a href="index.html" class="auth-logo">
+      <div class="nav-logo-mark">C</div>
+      <div>
+        <div class="nav-logo-text">CandyCove</div>
+        <div class="nav-logo-sub">not just candy, but a sweet escape</div>
+      </div>
+    </a>
+
+    <div class="auth-form-title">Create Account</div>
+    <div class="auth-form-sub">Already have an account? <a href="login.html">Sign in</a></div>
+
+    <div id="errorAlert" class="alert alert-error" style="display:none;margin-bottom:16px;">
+      <span>⚠️</span> <span id="errorMsg">Please fill in all required fields.</span>
+    </div>
+
+    <div class="form-stack">
+      <div class="form-group">
+        <label class="form-label">Full Name <span style="color:var(--magenta)">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <input type="text" id="name" class="form-control" placeholder="Sarah Johnson" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email Address <span style="color:var(--magenta)">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <input type="email" id="email" class="form-control" placeholder="hello@candycove.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number <span style="color:var(--magenta)">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.68A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></span>
+          <input type="tel" id="phone" class="form-control" placeholder="+1 (555) 000-0000" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password <span style="color:var(--magenta)">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+          <input type="password" id="password" class="form-control" placeholder="Min. 8 characters" required>
+        </div>
+        <div class="input-hint">Must be at least 8 characters</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password <span style="color:var(--magenta)">*</span></label>
+        <div class="input-icon-wrap">
+          <span class="input-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+          <input type="password" id="password_confirmation" class="form-control" placeholder="Repeat password" required>
+        </div>
+      </div>
+
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-mid);cursor:none;line-height:1.5;">
+        <input type="checkbox" id="terms" style="cursor:none;accent-color:var(--magenta);margin-top:2px;">
+        I agree to the <a href="#" style="color:var(--magenta)">Terms of Service</a> and <a href="#" style="color:var(--magenta)">Privacy Policy</a>
+      </label>
+
+      <button class="btn btn-primary w-full btn-lg" onclick="handleRegister()">Create Account</button>
+
+      
+    </div>
+
+    <div style="text-align:center;font-size:14px;color:var(--text-mid);margin-top:24px;">
+      Already have an account? <a href="login.html" style="color:var(--magenta);font-weight:500;cursor:none;">Sign in →</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="app.js"></script>
+<script>
+async function handleRegister() {
+
+  const name  = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const pass  = document.getElementById('password').value;
+  const conf  = document.getElementById('password_confirmation').value;
+  const terms = document.getElementById('terms').checked;
+
+  const errBox = document.getElementById('errorAlert');
+  const errMsg = document.getElementById('errorMsg');
+  const btn    = document.getElementById('registerBtn');
+
+  errBox.style.display = "none";
+  errMsg.textContent = "";
+
+  // Frontend validation
+  if (!name || !email || !phone || !pass || !conf) {
+    errMsg.textContent = "Please fill in all required fields.";
+    errBox.style.display = "flex";
+    return;
+  }
+
+  if (pass.length < 8) {
+    errMsg.textContent = "Password must be at least 8 characters.";
+    errBox.style.display = "flex";
+    return;
+  }
+
+  if (pass !== conf) {
+    errMsg.textContent = "Passwords do not match.";
+    errBox.style.display = "flex";
+    return;
+  }
+
+  if (!terms) {
+    errMsg.textContent = "Please accept the Terms.";
+    errBox.style.display = "flex";
+    return;
+  }
+
+  // btn.innerHTML = "Creating account... 🎉";
+  // btn.disabled = true;
+
+  try {
+
+    const { ok, data, status } = await apiFetch('/register', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        email,
+        phone,
+        password: pass,
+        password_confirmation: conf
+      })
+    });
+
+    if (ok) {
+
+      if (data.token) setToken(data.token);
+      if (data.user) setUser(data.user);
+
+      showToast("Account created successfully! 🎉", "success");
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1200);
+
+    } else {
+
+      // Laravel validation errors
+      if (status === 422 && data.errors) {
+        const firstError = Object.values(data.errors)[0][0];
+        errMsg.textContent = firstError;
+      } else {
+        errMsg.textContent = data.message || "Registration failed.";
+      }
+
+      errBox.style.display = "flex";
+      btn.innerHTML = "Create Account";
+      btn.disabled = false;
+    }
+
+  } catch (error) {
+
+    errMsg.textContent = "Server connection error.";
+    errBox.style.display = "flex";
+    btn.innerHTML = "Create Account";
+    btn.disabled = false;
+  }
+}
+
+</script>
+</script>
+</body>
+</html>

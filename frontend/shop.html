@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">C</div>
+      <div>
+        <div class="nav-logo-text">CandyCove</div>
+        <div class="nav-logo-sub">not just candy, but a sweet escape</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="shop.html" class="nav-link active">Shop</a>
+      <a href="orders.html" class="nav-link">My Orders</a>
+    </div>
+    <div class="nav-actions">
+      <a href="cart.html" class="nav-icon-btn" id="cartIcon">
+        🛒 <span class="cart-badge" id="cartCount">0</span>
+      </a>
+      <a href="login.html" class="btn-nav-user" id="navAuthBtn">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Shop All Products</h1>
+    <p>Browse our delicious candy collection 🍬</p>
+  </div>
+</div>
+
+<div style="background:white;border-bottom:1px solid var(--border-soft);padding:16px 0;">
+  <div class="container" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+    <div style="flex:1;min-width:200px;">
+      <input type="text" id="searchInput" class="form-control"
+        placeholder="🔍 Search candies..."
+        style="border-radius:var(--radius-pill);padding-left:16px;"
+        oninput="debounceSearch()">
+    </div>
+
+    <select id="categoryFilter" class="form-control"
+      style="width:180px;border-radius:var(--radius-pill);"
+      onchange="loadProducts()">
+      <option value="">All Categories</option>
+    </select>
+
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="number" id="minPrice" class="form-control"
+        placeholder="Min $" style="width:90px;border-radius:var(--radius-pill);"
+        oninput="debounceSearch()">
+      <span style="color:var(--muted)">—</span>
+      <input type="number" id="maxPrice" class="form-control"
+        placeholder="Max $" style="width:90px;border-radius:var(--radius-pill);"
+        oninput="debounceSearch()">
+    </div>
+
+    <select id="sortPrice" class="form-control"
+      style="width:160px;border-radius:var(--radius-pill);"
+      onchange="loadProducts()">
+      <option value="">Sort by Price</option>
+      <option value="asc">Price: Low to High</option>
+      <option value="desc">Price: High to Low</option>
+    </select>
+
+    <button class="btn btn-ghost btn-sm" onclick="clearFilters()">✕ Clear</button>
+  </div>
+</div>
+
+<div class="container section">
+  <div id="productsLoading" style="text-align:center;padding:60px;color:var(--muted);">
+    Loading products... 🍬
+  </div>
+
+  <div id="productsEmpty" style="display:none;text-align:center;padding:60px;">
+    <div style="font-size:64px;margin-bottom:16px;">🍬</div>
+    <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">No products found!</h3>
+    <p style="color:var(--muted)">Try adjusting your filters.</p>
+  </div>
+
+  <div class="products-grid" id="productsContainer"
+    style="grid-template-columns:repeat(4,1fr);gap:24px;display:none;"></div>
+
+  <div id="pagination"
+    style="display:flex;justify-content:center;gap:8px;margin-top:40px;"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="app.js"></script>
+<script>
+
+let searchTimer = null;
+let currentPage = 1;
+let isAdmin = false;
+
+/* ── Categories ── */
+async function loadCategories() {
+  const res = await apiFetch('/categories');
+  if (!res.ok) return;
+  const categories = res.data.data || res.data;
+  const select = document.getElementById('categoryFilter');
+  categories.forEach(cat => {
+    const opt = document.createElement('option');
+    opt.value = cat.id;
+    opt.textContent = cat.name;
+    select.appendChild(opt);
+  });
+}
+
+/* ── Load products ── */
+async function loadProducts(page = 1) {
+
+  currentPage = page;
+
+  document.getElementById('productsLoading').style.display = 'block';
+  document.getElementById('productsContainer').style.display = 'none';
+  document.getElementById('productsEmpty').style.display = 'none';
+
+  const params = new URLSearchParams();
+  const search     = document.getElementById('searchInput').value.trim();
+  const categoryId = document.getElementById('categoryFilter').value;
+  const minPrice   = document.getElementById('minPrice').value;
+  const maxPrice   = document.getElementById('maxPrice').value;
+  const sortPrice  = document.getElementById('sortPrice').value;
+
+  if (search) params.append('search', search);
+  if (categoryId) params.append('category_id', categoryId);
+  if (minPrice) params.append('min_price', minPrice);
+  if (maxPrice) params.append('max_price', maxPrice);
+  if (sortPrice) params.append('order_by_price', sortPrice);
+  params.append('page', page);
+
+  const res = await apiFetch(`/products?${params.toString()}`);
+  document.getElementById('productsLoading').style.display = 'none';
+
+  if (!res.ok) {
+    showToast('Failed to load products', 'error');
+    return;
+  }
+
+  const products = res.data.data;
+
+  if (!products || products.length === 0) {
+    document.getElementById('productsEmpty').style.display = 'block';
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+
+  document.getElementById('productsContainer').style.display = 'grid';
+  renderProducts(products);
+  renderPagination(res.data);
+}
+
+/* ── Render products ── */
+function renderProducts(products) {
+  const container = document.getElementById('productsContainer');
+
+  container.innerHTML = products.map(p => {
+
+    let imgUrl = p.images?.find(i => i.is_primary === 1)?.url || p.images?.[0]?.url || '';
+    const imgHtml = imgUrl
+      ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg);" />`
+      : `<div style="display:flex;align-items:center;justify-content:center;font-size:40px;height:100%;background:linear-gradient(135deg,var(--magenta-pale),var(--lavender-pale));border-radius:var(--radius-lg);">${p.name.charAt(0).toUpperCase()}</div>`;
+
+    return `
+      <div class="product-card">
+        <a href="product.html?id=${p.id}">
+          <div class="product-card-img" style="width:100%;aspect-ratio:1;overflow:hidden;">
+            ${imgHtml}
+          </div>
+        </a>
+        <div class="product-card-body">
+          <div class="product-card-cat">${p.category?.name || 'Candy'}</div>
+          <a href="product.html?id=${p.id}">
+            <div class="product-card-name">${p.name}</div>
+          </a>
+          <div class="product-card-footer">
+            <span class="product-price">$${parseFloat(p.price).toFixed(2)}</span>
+            ${
+              isAdmin
+              ? `<button class="add-to-cart-btn" disabled style="opacity:0.5;cursor:not-allowed;">Admin</button>`
+              : `<button class="add-to-cart-btn" onclick="addToCartAPI(${p.id})">+</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ── Add to cart ── */
+async function addToCartAPI(productId, qty = 1) {
+
+  if (isAdmin) {
+    showToast('Admins cannot shop 🚫', 'warning');
+    return;
+  }
+
+  if (!getToken()) {
+    showToast('Please sign in 🔐', 'warning');
+    setTimeout(() => window.location.href = 'login.html', 1500);
+    return;
+  }
+
+  const res = await apiFetch('/cart', {
+    method: 'POST',
+    body: JSON.stringify({ product_id: productId, quantity: qty })
+  });
+
+  if (res.ok) {
+    showToast('Added to cart! 🛒', 'success');
+    await updateCartBadge();
+  } else {
+    showToast(res.data.message || 'Failed', 'error');
+  }
+}
+
+/* ── Pagination ── */
+function renderPagination(meta) {
+  const container = document.getElementById('pagination');
+  if (!meta || meta.last_page <= 1) { container.innerHTML = ''; return; }
+  let html = '';
+  for (let i = 1; i <= meta.last_page; i++) {
+    html += `<button onclick="loadProducts(${i})">${i}</button>`;
+  }
+  container.innerHTML = html;
+}
+
+/* ── Search ── */
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadProducts(1), 500);
+}
+
+/* ── Clear ── */
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('categoryFilter').value = '';
+  document.getElementById('minPrice').value = '';
+  document.getElementById('maxPrice').value = '';
+  document.getElementById('sortPrice').value = '';
+  loadProducts(1);
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+
+  const currentUser = getUser();
+  isAdmin = currentUser && currentUser.role === 'admin';
+
+  
+
+  await loadCategories();
+  await loadProducts();
+  await updateCartBadge();
+});
+
+</script>
+</body>
+</html>

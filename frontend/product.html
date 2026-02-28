@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="cursor-outer" id="cursorOuter"></div>
+<div class="cursor-dot"   id="cursorDot"></div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">C</div>
+      <div><div class="nav-logo-text">CandyCove</div><div class="nav-logo-sub">not just candy, but a sweet escape</div></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"  class="nav-link">Home</a>
+      <a href="shop.html"   class="nav-link active">Shop</a>
+      <a href="orders.html" class="nav-link">My Orders</a>
+    </div>
+    <div class="nav-actions">
+      <a href="cart.html" class="nav-icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="login.html" class="btn-nav-user" id="navAuthBtn">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ PAGE HEADER ══ -->
+<div class="page-header">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> <span class="breadcrumb-sep">›</span>
+      <a href="shop.html">Shop</a>  <span class="breadcrumb-sep">›</span>
+      <span id="breadcrumbCategory">...</span> <span class="breadcrumb-sep">›</span>
+      <span id="breadcrumbName">...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LOADING STATE ══ -->
+<div id="pageLoading" class="container section" style="text-align:center;padding:80px;color:var(--muted);">
+  Loading product... 🍬
+</div>
+
+<!-- ══ ERROR STATE ══ -->
+<div id="pageError" class="container section" style="display:none;text-align:center;padding:80px;">
+  <div style="font-size:64px;margin-bottom:16px;">😕</div>
+  <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">Product not found</h3>
+  <a href="shop.html" class="btn btn-primary">Back to Shop</a>
+</div>
+
+<!-- ══ PRODUCT DETAIL ══ -->
+<div id="pageContent" class="container section" style="display:none;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;">
+
+    <!-- IMAGES -->
+    <div style="position:sticky;top:90px;">
+      <div id="mainImg" style="width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--magenta-pale),var(--lavender-pale));border-radius:var(--radius-lg);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:120px;margin-bottom:16px;box-shadow:var(--shadow-md);"></div>
+      <div id="thumbsRow" style="display:flex;gap:10px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- INFO -->
+    <div>
+      <div style="margin-bottom:12px;">
+        <span class="badge badge-magenta" id="productCategory">—</span>
+        <span id="stockBadge" class="badge badge-teal" style="margin-left:6px;">In Stock</span>
+      </div>
+      <h1 id="productName" style="font-size:clamp(28px,4vw,42px);font-weight:800;margin-bottom:14px;line-height:1.15;">—</h1>
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <span id="productPrice" style="font-size:36px;font-weight:700;color:var(--magenta);">—</span>
+      </div>
+
+      <p id="productDescription" style="font-size:15px;color:var(--text-mid);line-height:1.75;margin-bottom:28px;"></p>
+
+      <div style="margin-bottom:28px;">
+        <div class="label-sm" style="margin-bottom:10px;">Quantity</div>
+        <div class="quantity-control">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span class="qty-num" id="qtyDisplay">1</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <div id="stockInfo" style="font-size:13px;color:var(--muted);margin-top:8px;"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;">
+        <button class="btn btn-primary btn-lg" id="addToCartBtn" onclick="handleAddToCart()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+          Add to Cart
+        </button>
+        <a href="cart.html" class="btn btn-outline btn-lg">View Cart</a>
+      </div>
+
+      <!-- Meta -->
+      <div style="padding-top:24px;border-top:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:14px;color:var(--text-mid);">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🚚</div>
+          Free delivery on orders over $50
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text-mid);">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--yellow-pale);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">📦</div>
+          <span id="dispatchInfo">Dispatched within 24 hours</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RELATED PRODUCTS -->
+  <div style="margin-top:80px;">
+    <div class="section-header">
+      <span class="section-eyebrow">You might also love</span>
+      <h2 class="section-title">Related Products</h2>
+    </div>
+    <div class="products-grid" id="relatedProducts" style="grid-template-columns:repeat(4,1fr);"></div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand-logo"><div class="footer-logo-mark">C</div><div class="footer-logo-text">CandyCove</div></div><p class="footer-brand-desc">Not just candy, but a sweet escape.</p></div>
+      <div><div class="footer-col-title">Shop</div><a href="shop.html" class="footer-link">All Products</a></div>
+      <div><div class="footer-col-title">Account</div><a href="login.html" class="footer-link">Sign In</a><a href="orders.html" class="footer-link">My Orders</a></div>
+      <div><div class="footer-col-title">Help</div><a class="footer-link">Shipping</a><a class="footer-link">Returns</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 CandyCove. All rights reserved.</span></div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="app.js"></script>
+<script>
+  let product = null;
+  let qty = 1;
+let isAdmin = false;
+
+  // ── Init ──
+ document.addEventListener('DOMContentLoaded', async () => {
+
+  const user = getUser();
+  isAdmin = user && user.role === 'admin';
+
+  if (user) {
+    document.getElementById('navAuthBtn').textContent =
+      `Hi, ${user.name?.split(' ')[0]} 👋`;
+    document.getElementById('navAuthBtn').href =
+      isAdmin ? 'admin.html' : 'orders.html';
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const productId = params.get('id');
+
+  if (!productId) {
+    showError();
+    return;
+  }
+
+  await loadProduct(productId);
+  await updateCartBadge();
+});
+
+  // ── Load product ──
+  async function loadProduct(id) {
+    const res = await apiFetch(`/products/${id}`);
+
+    document.getElementById('pageLoading').style.display = 'none';
+
+    if (!res.ok) {
+      showError();
+      return;
+    }
+
+  
+    product = res.data.product;
+product.images = res.data.images;
+    renderProduct(product);
+    console.log('Loaded product:', product , 'Loading related products for category', product.category_id);
+    await loadRelatedProducts(product.category_id, product.id);
+  }
+
+  // ── Render product ──
+  function renderProduct(p) {
+    document.title = `${p.name} — CandyCove`;
+    console.log('Rendering product:', p);
+
+    // Breadcrumb
+    document.getElementById('breadcrumbCategory').textContent = p.category?.name || 'Products';
+    document.getElementById('breadcrumbName').textContent = p.name;
+
+    // Badges
+    document.getElementById('productCategory').textContent = p.category?.name || '—';
+    const stockBadge = document.getElementById('stockBadge');
+    if (p.stock > 0) {
+      stockBadge.textContent = 'In Stock';
+      stockBadge.className = 'badge badge-teal';
+    } else {
+      stockBadge.textContent = 'Out of Stock';
+      stockBadge.className = 'badge badge-magenta';
+      document.getElementById('addToCartBtn').disabled = true;
+      document.getElementById('addToCartBtn').textContent = 'Out of Stock';
+    }
+
+    // Info
+    document.getElementById('productName').textContent = p.name;
+    document.getElementById('productPrice').textContent = `$${parseFloat(p.price).toFixed(2)}`;
+    document.getElementById('dispatchInfo').textContent = p.stock > 0 ? 'In Stock — dispatched within 24 hours' : 'Currently out of stock';
+
+    // 🔒 Disable shopping for admin (SAFE PATCH)
+// 🔒 Disable shopping for admin (SAFE PATCH)
+if (isAdmin) {
+
+  const addBtn = document.getElementById('addToCartBtn');
+  addBtn.disabled = true;
+  addBtn.style.opacity = '0.6';
+  addBtn.style.cursor = 'not-allowed';
+  addBtn.textContent = 'Admin Mode';
+
+  // Disable quantity buttons
+  document.querySelectorAll('.qty-btn')
+    .forEach(btn => btn.disabled = true);
+
+  // Disable View Cart button
+  const viewCartBtn = document.querySelector('a[href="cart.html"]');
+  if (viewCartBtn) {
+    viewCartBtn.style.pointerEvents = 'none';
+    viewCartBtn.style.opacity = '0.5';
+    viewCartBtn.textContent = 'Cart Disabled';
+  }
+}
+
+    // Images
+    const images = p.images || [];
+    const mainImg = document.getElementById('mainImg');
+
+    if (images.length > 0) {
+      const primaryImg = images.find(i => i.is_primary === 1) || images[0];
+      if (primaryImg.url) {
+        mainImg.innerHTML = `<img src="${primaryImg.url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">`;
+      } else {
+        mainImg.innerHTML = `<span style="font-size:120px;">🍬</span>`;
+      }
+
+      // Thumbnails
+      document.getElementById('thumbsRow').innerHTML = images.map((img, i) => {
+        const thumb = img.url
+          ? `<img src="${img.url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-sm);">`
+          : `<span style="font-size:28px;">🍬</span>`;
+        return `<div onclick="setMainImg('${img.url || ''}')"
+          style="width:72px;height:72px;border-radius:var(--radius-sm);overflow:hidden;
+          display:flex;align-items:center;justify-content:center;cursor:pointer;
+          border:2px solid ${i === 0 ? 'var(--magenta)' : 'transparent'};
+          background:var(--cream-deep);transition:var(--transition);"
+          id="thumb-${i}">
+          ${thumb}
+        </div>`;
+      }).join('');
+    } else {
+      mainImg.innerHTML = `<span style="font-size:120px;">🍬</span>`;
+    }
+
+    document.getElementById('pageContent').style.display = 'block';
+  }
+
+  // ── Set main image ──
+  function setMainImg(url) {
+    const mainImg = document.getElementById('mainImg');
+    if (url) {
+      mainImg.innerHTML = `<img src="${url}" alt="product" style="width:100%;height:100%;object-fit:cover;">`;
+    }
+    // Update thumb borders
+    document.querySelectorAll('[id^="thumb-"]').forEach(t => t.style.borderColor = 'transparent');
+  }
+
+  // ── Load related products ──
+  async function loadRelatedProducts(categoryId, excludeId) {
+    console.log('Loading related products for category', categoryId, 'excluding product', excludeId);
+    const res = await apiFetch(`/products?category_id=${categoryId}`);
+    if (!res.ok) return;
+
+    const related = (res.data.data || []).filter(p => p.id !== excludeId).slice(0, 4);
+    const container = document.getElementById('relatedProducts');
+
+    if (related.length === 0) {
+      container.closest('div[style*="margin-top:80px"]')?.style && (container.parentElement.style.display = 'none');
+      return;
+    }
+
+    container.innerHTML = related.map(p => {
+      const imgUrl = p.images?.find(i => i.is_primary === 1)?.url || p.images?.[0]?.url || '';
+      const imgHtml = imgUrl
+        ? `<img src="${imgUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-lg);">`
+        : `<div style="display:flex;align-items:center;justify-content:center;font-size:40px;height:100%;background:linear-gradient(135deg,var(--magenta-pale),var(--lavender-pale));border-radius:var(--radius-lg);">🍬</div>`;
+      return `
+        <div class="product-card">
+          <a href="product.html?id=${p.id}">
+            <div class="product-card-img" style="width:100%;aspect-ratio:1;overflow:hidden;">${imgHtml}</div>
+          </a>
+          <div class="product-card-body">
+            <div class="product-card-cat">${p.category?.name || ''}</div>
+            <a href="product.html?id=${p.id}"><div class="product-card-name">${p.name}</div></a>
+            <div class="product-card-footer">
+              <span class="product-price">$${parseFloat(p.price).toFixed(2)}</span>
+            ${
+  isAdmin
+  ? `<button class="add-to-cart-btn"
+       disabled
+       style="opacity:0.5;cursor:not-allowed;">
+       Admin
+     </button>`
+  : `<button class="add-to-cart-btn"
+       onclick="addRelatedToCart(${p.id})">
+       +
+     </button>`
+}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Quantity control ──
+  function changeQty(delta) {
+    const maxStock = product?.stock || 1;
+    qty = Math.max(1, Math.min(qty + delta, maxStock));
+    document.getElementById('qtyDisplay').textContent = qty;
+  }
+
+  // ── Add to cart ──
+  async function handleAddToCart() {
+
+    if (isAdmin) {
+  showToast('Admins cannot shop 🚫', 'warning');
+  return;
+}
+
+    if (!getToken()) {
+      showToast('Please sign in to add items to cart 🔐', 'warning');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      return;
+    }
+
+    const btn = document.getElementById('addToCartBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding...';
+
+    const res = await apiFetch('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ product_id: product.id, quantity: qty })
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Add to Cart`;
+
+    if (res.ok) {
+      showToast(`${product.name} added to cart! 🛒`, 'success');
+      await updateCartBadge();
+    } else {
+      showToast(res.data.message || 'Failed to add to cart', 'error');
+    }
+  }
+
+  async function addRelatedToCart(productId) {
+    if (isAdmin) {
+  showToast('Admins cannot shop 🚫', 'warning');
+  return;
+}
+    if (!getToken()) {
+      showToast('Please sign in to add items to cart 🔐', 'warning');
+      setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      return;
+    }
+    const res = await apiFetch('/cart', {
+      method: 'POST',
+      body: JSON.stringify({ product_id: productId, quantity: 1 })
+    });
+    if (res.ok) {
+      showToast('Added to cart! 🛒', 'success');
+      await updateCartBadge();
+    } else {
+      showToast(res.data.message || 'Failed to add to cart', 'error');
+    }
+  }
+
+  function showError() {
+    document.getElementById('pageLoading').style.display = 'none';
+    document.getElementById('pageError').style.display = 'block';
+  }
+</script>
+</body>
+</html>
