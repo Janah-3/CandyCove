@@ -108,6 +108,8 @@
 
   const user = getUser(); // 👈 get stored user
 
+  console.log('Logged in user:', user); // Debug log
+  
   if (user && user.role === 'admin') {
     window.location.href = 'admin.html';
   } else {
