@@ -31,7 +31,8 @@ function viewCart(Request $request){
                 'name' => $product->name,
                 'price' => $product->price,
                 'quantity' => $quantity,
-                'total_price' => $product->price * $quantity
+                'total_price' => $product->price * $quantity,
+                'image' => $product->images->first()?->url ?? null
             ];
         }
     }
@@ -61,7 +62,7 @@ function viewCart(Request $request){
 
 
 
-   $product = product::find($productId);
+   $product = Product::with('images')->findOrFail($productId);
 
     $existingQuantity = $cartItems[$productId] ?? 0;
 
@@ -109,7 +110,7 @@ function viewCart(Request $request){
     return response()->json(['message' => 'Product removed successfully'], 200);
 }
 
-function decreseAmount(Request $request, $productId){
+function decreaseAmount(Request $request, $productId){
 
 
     $userId = $request->user()->id;

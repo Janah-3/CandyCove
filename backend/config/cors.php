@@ -15,10 +15,11 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
-    'allowed_origins' => ['https://candycovee.up.railway.app', 'http://localhost:3000'],
-    
+    'paths' => ['*'],
+
     'allowed_methods' => ['*'],
+
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 

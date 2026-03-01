@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class order extends Model
 {
     //
+    public $timestamps = false;
 
     protected $fillable = [
         'user_id',
-        'adress_id',
+        'address_id',
         'status',
         'ordered_at',
+        'total_amount',
+        'number_of_items',
     ];
 
 
