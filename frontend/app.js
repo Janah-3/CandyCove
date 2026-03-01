@@ -157,6 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navActions = document.querySelector('.nav-actions');
   const isAdmin = user?.role === 'admin';
   const isGuest = !user;
+  console.log('[NAV DEBUG] user:', user, 'navActions:', navActions, 'isAdmin:', isAdmin);
 
   // Hide "My Orders" link for admins and guests
   document.querySelectorAll('.nav-link').forEach(link => {
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <span class="cart-badge" id="cartBadge">0</span>
       </a>` : ''}
-      <a href="${isAdmin ? 'orders.html' : 'orders.html'}" class="btn-nav-user" id="navAuthBtn">
+      <a href="${isAdmin ? 'admin.html' : 'orders.html'}" class="btn-nav-user" id="navAuthBtn">
         Hi, ${user.name?.split(' ')[0]} 👋
       </a>
       ${isAdmin ? `<a href="admin.html" class="btn btn-primary btn-sm" style="font-size:13px;display:flex;align-items:center;gap:6px;">
