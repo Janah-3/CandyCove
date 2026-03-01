@@ -19,7 +19,13 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+   'allowed_origins' => [
+    'https://candycovee.up.railway.app',
+    'http://localhost',
+    'http://localhost:3000',
+],
+
+'supports_credentials' => true,
 
     'allowed_origins_patterns' => [],
 
