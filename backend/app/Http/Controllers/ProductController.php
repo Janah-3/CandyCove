@@ -25,7 +25,7 @@ public static function middleware(): array
      */
     public function index()
     {
-        $query = product::query();
+       try{ $query = product::query();
          
         if (request()->has('category_id')) {
             $query->where('category_id', request()->input('category_id'));
@@ -50,7 +50,15 @@ public static function middleware(): array
 
         $products = $query->paginate(15);
        
-        return response()->json($products);
+        return response()->json($products);}
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
     }
 
     /**
