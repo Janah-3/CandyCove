@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart & Checkout — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="cursor-outer" id="cursorOuter"></div>
+<div class="cursor-dot"   id="cursorDot"></div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">C</div>
+      <div><div class="nav-logo-text">CandyCove</div><div class="nav-logo-sub">not just candy, but a sweet escape</div></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"  class="nav-link">Home</a>
+      <a href="shop.html"   class="nav-link">Shop</a>
+      <a href="orders.html" class="nav-link">My Orders</a>
+    </div>
+    <div class="nav-actions">
+      <a href="cart.html" class="nav-icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="login.html" class="btn-nav-user">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ STEP TABS ══ -->
+<div style="background:white;border-bottom:1px solid var(--border-soft);">
+  <div class="container" style="display:flex;align-items:center;gap:0;padding-top:0;padding-bottom:0;">
+    <button id="tab-cart"     onclick="switchTab('cart')"     style="padding:18px 28px;font-size:14px;font-weight:500;color:var(--magenta);border-bottom:2px solid var(--magenta);background:none;border-left:none;border-top:none;border-right:none;cursor:none;display:flex;align-items:center;gap:8px;">
+      <span style="width:24px;height:24px;border-radius:50%;background:var(--magenta);color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">1</span> Cart
+    </button>
+    <button id="tab-checkout" onclick="switchTab('checkout')" style="padding:18px 28px;font-size:14px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;background:none;border-left:none;border-top:none;border-right:none;cursor:none;display:flex;align-items:center;gap:8px;">
+      <span style="width:24px;height:24px;border-radius:50%;background:var(--cream-deep);color:var(--muted);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</span> Checkout
+    </button>
+  </div>
+</div>
+
+<!-- ══ CART STEP ══ -->
+<div id="step-cart" class="container section">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;">
+    <h1 style="font-size:28px;font-weight:800;">Your Cart <span id="cartCountLabel" style="font-size:18px;color:var(--muted);font-weight:400;"></span></h1>
+    <button class="btn btn-ghost btn-sm" onclick="clearCartUI()">🗑 Clear Cart</button>
+  </div>
+
+  <!-- Loading state -->
+  <div id="cartLoading" style="text-align:center;padding:60px;color:var(--muted);">Loading your cart... 🍬</div>
+
+  <!-- Empty state -->
+  <div id="cartEmpty" style="display:none;text-align:center;padding:60px;">
+    <div style="font-size:64px;margin-bottom:16px;">🛒</div>
+    <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">Your cart is empty!</h3>
+    <p style="color:var(--muted);margin-bottom:24px;">Looks like you haven't added anything yet.</p>
+    <a href="shop.html" class="btn btn-primary">Start Shopping →</a>
+  </div>
+
+  <div id="cartContent" style="display:none;">
+    <div class="cart-layout">
+      <div id="cartItemsList"></div>
+
+      <!-- Summary -->
+      <div class="cart-summary-card">
+        <div class="cart-summary-title">Order Summary</div>
+        <div class="cart-summary-row"><span id="subtotalLabel">Subtotal</span><span id="subtotalValue">$0.00</span></div>
+        <div class="cart-summary-row"><span>Delivery</span><span style="color:var(--teal-deep)">Free</span></div>
+        <div class="cart-summary-row total"><span>Total</span><span id="totalValue">$0.00</span></div>
+        <button class="btn btn-primary w-full btn-lg" onclick="switchTab('checkout')">Proceed to Checkout →</button>
+        <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted);">🔒 Secure checkout · SSL encrypted</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKOUT STEP ══ -->
+<div id="step-checkout" class="container section" style="display:none;">
+  <div class="checkout-layout">
+    <div>
+      <!-- Saved Addresses -->
+      <div class="checkout-form-card">
+        <div class="checkout-section-title"><div class="checkout-step-num">1</div> Delivery Address</div>
+        <div id="addressesList">
+          <div style="text-align:center;padding:20px;color:var(--muted);">Loading addresses...</div>
+        </div>
+        <button onclick="toggleNewAddress()" class="btn btn-ghost btn-sm" style="margin-top:12px;">+ Add New Address</button>
+      </div>
+
+      <!-- New Address Form -->
+      <div id="newAddressForm" class="checkout-form-card" style="display:none;">
+        <div class="checkout-section-title"><div class="checkout-step-num">2</div> New Address</div>
+        <div class="form-stack">
+          <div class="form-group"><label class="form-label">Street Address</label><input class="form-control" id="newStreet" placeholder="123 Sweet Street"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">City</label><input class="form-control" id="newCity" placeholder="New York"></div>
+            <div class="form-group"><label class="form-label">Building No.</label><input class="form-control" id="newBuilding" placeholder="5"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Apartment No. <span style="color:var(--muted);font-size:11px">(optional)</span></label><input class="form-control" id="newApartment" placeholder="4B"></div>
+            <div class="form-group"><label class="form-label">Phone Number</label><input class="form-control" id="newPhone" placeholder="+1 (555) 000-0000"></div>
+          </div>
+          <button class="btn btn-teal btn-sm" onclick="saveNewAddress()">Save Address</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Review -->
+    <div class="order-review-card">
+      <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:22px;">Review Order</div>
+      <div id="checkoutItemsList"></div>
+      <div class="divider"></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:var(--text-mid)"><span>Subtotal</span><span id="checkoutSubtotal">$0.00</span></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:14px;color:var(--text-mid)"><span>Delivery</span><span style="color:var(--teal-deep)">Free</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;margin-bottom:24px;"><span>Total</span><span id="checkoutTotal" style="color:var(--magenta)">$0.00</span></div>
+      <button class="btn btn-primary w-full btn-lg" id="placeOrderBtn" onclick="placeOrder()">Place Order 🎉</button>
+      <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted);">🔒 Cash on delivery · Safe & secure</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand-logo"><div class="footer-logo-mark">C</div><div class="footer-logo-text">CandyCove</div></div><p class="footer-brand-desc">Not just candy, but a sweet escape.</p></div>
+      <div><div class="footer-col-title">Shop</div><a href="shop.html" class="footer-link">All Products</a></div>
+      <div><div class="footer-col-title">Account</div><a href="login.html" class="footer-link">Sign In</a><a href="orders.html" class="footer-link">My Orders</a></div>
+      <div><div class="footer-col-title">Help</div><a class="footer-link">Shipping</a><a class="footer-link">Returns</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 CandyCove. All rights reserved.</span></div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="app.js"></script>
+<script>
+  let cartItems = [];
+  let selectedAddressId = null;
+
+  // ── Load cart on page load ──
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!requireAuth()) return;
+    await loadCart();
+  });
+
+  async function loadCart() {
+    document.getElementById('cartLoading').style.display = 'block';
+    document.getElementById('cartContent').style.display = 'none';
+    document.getElementById('cartEmpty').style.display = 'none';
+
+    const res = await apiFetch('/cart');
+
+    document.getElementById('cartLoading').style.display = 'none';
+
+    if (!res.ok) {
+      showToast('Failed to load cart', 'error');
+      return;
+    }
+
+    cartItems = res.data.product_details || [];
+
+    if (cartItems.length === 0) {
+      document.getElementById('cartEmpty').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('cartContent').style.display = 'block';
+    renderCartItems();
+    updateCartBadge();
+  }
+
+ function renderCartItems() {
+  const list = document.getElementById('cartItemsList');
+  let subtotal = 0;
+
+  list.innerHTML = cartItems.map(item => {
+    subtotal += item.total_price;
+
+    return `
+      <div class="cart-item" id="cart-item-${item.id}">
+        <div class="cart-item-img">
+          ${item.image 
+            ? `<img src="${item.image}" alt="${item.name}" 
+                style="width:70px;height:70px;object-fit:cover;border-radius:12px;">`
+            : '🍬'}
+        </div>
+
+        <div>
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${parseFloat(item.price).toFixed(2)} each</div>
+
+          <div class="cart-item-controls">
+            <div class="cart-item-qty">
+              <button class="cart-qty-btn" onclick="decreaseQty(${item.id})">−</button>
+              <span class="cart-qty-num">${item.quantity}</span>
+              <button class="cart-qty-btn" onclick="increaseQty(${item.id})">+</button>
+            </div>
+            <button class="cart-item-remove" onclick="removeItem(${item.id})">🗑</button>
+          </div>
+        </div>
+
+        <div style="text-align:right;">
+          <div class="cart-item-subtotal">
+            $${parseFloat(item.total_price).toFixed(2)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('subtotalValue').textContent = `$${subtotal.toFixed(2)}`;
+  document.getElementById('totalValue').textContent = `$${subtotal.toFixed(2)}`;
+}
+
+  function renderCheckoutItems(subtotal) {
+    const list = document.getElementById('checkoutItemsList');
+    list.innerHTML = cartItems.map(item => `
+      <div class="order-review-item">
+       <div class="order-review-img">
+  ${item.image 
+      ? `<img src="${item.image}" alt="${item.name}" style="width:60px;height:60px;object-fit:cover;border-radius:10px;">`
+      : '🍬'}
+</div>
+        <div>
+          <div class="order-review-name">${item.name}</div>
+          <div class="order-review-qty">Qty: ${item.quantity} × $${parseFloat(item.price).toFixed(2)}</div>
+        </div>
+        <div class="order-review-price">$${parseFloat(item.total_price).toFixed(2)}</div>
+      </div>`).join('');
+
+    document.getElementById('checkoutSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('checkoutTotal').textContent = `$${subtotal.toFixed(2)}`;
+  }
+
+  async function increaseQty(productId) {
+    const res = await apiFetch(`/cart/increase/${productId}`, { method: 'PUT' });
+    if (res.ok) {
+      await loadCart();
+    } else {
+      showToast(res.data.message || 'Could not increase quantity', 'error');
+    }
+  }
+
+  async function decreaseQty(productId) {
+    const res = await apiFetch(`/cart/decrease/${productId}`, { method: 'PUT' });
+    if (res.ok) {
+      await loadCart();
+    } else {
+      showToast(res.data.message || 'Could not decrease quantity', 'error');
+    }
+  }
+
+  async function removeItem(productId) {
+    const res = await apiFetch(`/cart/${productId}`, { method: 'DELETE' });
+    if (res.ok) {
+      showToast('Item removed from cart', 'success');
+      await loadCart();
+    } else {
+      showToast('Failed to remove item', 'error');
+    }
+  }
+
+  async function clearCartUI() {
+    const res = await apiFetch('/cart/clear', { method: 'DELETE' });
+    if (res.ok) {
+      showToast('Cart cleared', 'success');
+      await loadCart();
+    } else {
+      showToast('Failed to clear cart', 'error');
+    }
+  }
+
+  // ── Addresses ──
+  async function loadAddresses() {
+    const res = await apiFetch('/user/addresses');
+    if (!res.ok) {
+      document.getElementById('addressesList').innerHTML = '<div style="color:var(--muted);font-size:13px;">No addresses found.</div>';
+      return;
+    }
+
+    const addresses = res.data.data || res.data;
+    if (!addresses || addresses.length === 0) {
+      document.getElementById('addressesList').innerHTML = '<div style="color:var(--muted);font-size:13px;">No saved addresses. Add one below.</div>';
+      return;
+    }
+
+    document.getElementById('addressesList').innerHTML = addresses.map((addr, i) => `
+      <div class="address-option ${i === 0 ? 'selected' : ''}" onclick="selectAddress(this, ${addr.id})" id="addr-${addr.id}">
+        <div class="address-radio"></div>
+        <div>
+          <div style="font-weight:600;font-size:14px;margin-bottom:2px;">${addr.street}</div>
+          <div style="font-size:13px;color:var(--text-mid);">${addr.building_no}${addr.appartment_no ? ', Apt ' + addr.appartment_no : ''}<br>${addr.city} · ${addr.phone}</div>
+        </div>
+      </div>`).join('');
+
+    // Auto-select first address
+    if (addresses.length > 0) selectedAddressId = addresses[0].id;
+  }
+
+  function selectAddress(el, addressId) {
+    document.querySelectorAll('.address-option').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedAddressId = addressId;
+  }
+
+  async function saveNewAddress() {
+    const street = document.getElementById('newStreet').value.trim();
+    const city = document.getElementById('newCity').value.trim();
+    const building_no = document.getElementById('newBuilding').value.trim();
+    const appartment_no = document.getElementById('newApartment').value.trim();
+    const phone = document.getElementById('newPhone').value.trim();
+
+    if (!street || !city || !building_no || !phone) {
+      showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    const res = await apiFetch('/addresses', {
+      method: 'POST',
+      body: JSON.stringify({ street, city, building_no, appartment_no, phone })
+    });
+
+    if (res.ok) {
+      showToast('Address saved! ✅', 'success');
+      document.getElementById('newAddressForm').style.display = 'none';
+      await loadAddresses();
+    } else {
+      showToast(res.data.message || 'Failed to save address', 'error');
+    }
+  }
+
+  async function placeOrder() {
+    if (!selectedAddressId) {
+      showToast('Please select a delivery address', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    btn.textContent = 'Placing order...';
+
+    const res = await apiFetch('/orders', {
+      method: 'POST',
+      body: JSON.stringify({ address_id: selectedAddressId })
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Place Order 🎉';
+
+    if (res.ok) {
+      showToast('Order placed successfully! 🎉', 'success');
+      setTimeout(() => { window.location.href = 'orders.html'; }, 1500);
+    } else {
+      showToast(res.data.message || 'Failed to place order', 'error');
+    }
+  }
+
+ function switchTab(tab) {
+  const isCart = tab === 'cart';
+
+  document.getElementById('step-cart').style.display     = isCart ? 'block' : 'none';
+  document.getElementById('step-checkout').style.display = isCart ? 'none'  : 'block';
+
+  const tabCart     = document.getElementById('tab-cart');
+  const tabCheckout = document.getElementById('tab-checkout');
+
+  tabCart.style.color        = isCart ? 'var(--magenta)' : 'var(--muted)';
+  tabCart.style.borderBottom = isCart ? '2px solid var(--magenta)' : '2px solid transparent';
+
+  tabCheckout.style.color        = !isCart ? 'var(--magenta)' : 'var(--muted)';
+  tabCheckout.style.borderBottom = !isCart ? '2px solid var(--magenta)' : '2px solid transparent';
+
+  if (!isCart) {
+    loadAddresses();
+
+    let subtotal = 0;
+    cartItems.forEach(item => {
+      subtotal += item.total_price;
+    });
+
+    renderCheckoutItems(subtotal);
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+  function toggleNewAddress() {
+    const el = document.getElementById('newAddressForm');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+</script>
+</body>
+</html>

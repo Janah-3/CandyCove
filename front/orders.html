@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Orders — CandyCove</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="cursor-outer" id="cursorOuter"></div>
+<div class="cursor-dot"   id="cursorDot"></div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">C</div>
+      <div><div class="nav-logo-text">CandyCove</div><div class="nav-logo-sub">not just candy, but a sweet escape</div></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"  class="nav-link">Home</a>
+      <a href="shop.html"   class="nav-link">Shop</a>
+      <a href="orders.html" class="nav-link active">My Orders</a>
+    </div>
+    <div class="nav-actions">
+      <a href="cart.html" class="nav-icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </a>
+      <a href="login.html" class="btn-nav-user" id="navAuthBtn">Sign In</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ GUEST GATE (shown if not logged in) ══ -->
+<div id="guestGate" style="display:none;">
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> <span class="breadcrumb-sep">›</span> <span>My Orders</span></div>
+      <h1>My Orders</h1>
+    </div>
+  </div>
+  <div class="container section" style="text-align:center;padding:80px 20px;">
+    <div style="font-size:72px;margin-bottom:20px;">🔐</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:800;margin-bottom:12px;">Sign in to view your orders</h2>
+    <p style="color:var(--muted);font-size:16px;max-width:400px;margin:0 auto 32px;">Track your sweet deliveries and order history by signing into your account.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="login.html" class="btn btn-primary btn-lg">Sign In</a>
+      <a href="register.html" class="btn btn-outline btn-lg">Create Account</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ORDERS LIST VIEW ══ -->
+<div id="view-list" style="display:none;">
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> <span class="breadcrumb-sep">›</span> <span>My Orders</span></div>
+      <h1>My Orders</h1>
+    </div>
+  </div>
+
+  <div class="container section">
+    <div class="cat-pills-group" style="display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;">
+      <button class="cat-pill active" onclick="filterByStatus('', this)">All Orders</button>
+      <button class="cat-pill" onclick="filterByStatus('pending', this)"> Pending</button>
+      <button class="cat-pill" onclick="filterByStatus('processing', this)"> Processing</button>
+      <button class="cat-pill" onclick="filterByStatus('delivered', this)">Delivered</button>
+      <button class="cat-pill" onclick="filterByStatus('cancelled', this)"> Cancelled</button>
+    </div>
+
+    <div class="search-bar" style="max-width:400px;margin-bottom:28px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="orderSearch" placeholder="Search by product name…" oninput="debounceSearch()">
+    </div>
+
+    <div id="ordersLoading" style="text-align:center;padding:60px;color:var(--muted);">Loading your orders... 🍬</div>
+
+    <div id="ordersEmpty" style="display:none;text-align:center;padding:60px;">
+      <div style="font-size:64px;margin-bottom:16px;">📦</div>
+      <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">No orders yet!</h3>
+      <p style="color:var(--muted);margin-bottom:24px;">Looks like you haven't placed any orders.</p>
+      <a href="shop.html" class="btn btn-primary">Start Shopping →</a>
+    </div>
+
+    <div id="ordersList"></div>
+    <div id="ordersPagination" style="display:flex;justify-content:center;gap:8px;margin-top:40px;"></div>
+  </div>
+</div>
+
+<!-- ══ ORDER DETAIL VIEW ══ -->
+<div id="view-detail" style="display:none;">
+  <div class="page-header">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <a href="#" onclick="showList();return false;">My Orders</a>
+        <span class="breadcrumb-sep">›</span>
+        <span id="detailOrderId">Order</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <h1 id="detailOrderTitle">Order Details</h1>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span id="detailStatusBadge" style="font-size:14px;padding:7px 18px;border-radius:var(--radius-pill);"></span>
+          <!-- Cancel button — only shown for pending orders -->
+          <button id="cancelOrderBtn" onclick="cancelOrder()"
+            style="display:none;"
+            class="btn btn-danger btn-sm">
+            Cancel Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container section">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start;">
+      <div>
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border-soft);padding:28px;margin-bottom:16px;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:20px;">Order Items</div>
+          <div id="detailItemsList"></div>
+        </div>
+
+        <div style="background:white;border-radius:var(--radius);border:1px solid var(--border-soft);padding:28px;">
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:20px;">Order Tracking</div>
+          <div class="timeline" id="detailTimeline"></div>
+        </div>
+      </div>
+
+      <div class="order-review-card">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:18px;">Order Summary</div>
+        <div style="font-size:14px;color:var(--text-mid);margin-bottom:8px;display:flex;justify-content:space-between;"><span>Order ID</span><span id="detailSummaryId" style="color:var(--text);font-weight:500;"></span></div>
+        <div style="font-size:14px;color:var(--text-mid);margin-bottom:8px;display:flex;justify-content:space-between;"><span>Date</span><span id="detailSummaryDate" style="color:var(--text);font-weight:500;"></span></div>
+        <div style="font-size:14px;color:var(--text-mid);margin-bottom:8px;display:flex;justify-content:space-between;"><span>Items</span><span id="detailSummaryItems" style="color:var(--text);font-weight:500;"></span></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:700;margin-bottom:20px;"><span>Total</span><span id="detailSummaryTotal" style="color:var(--magenta)"></span></div>
+        <div class="divider"></div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;">Delivery Address</div>
+        <div id="detailAddress" style="font-size:13px;color:var(--text-mid);line-height:1.65;"></div>
+        <button onclick="showList()" class="btn btn-ghost w-full btn-sm" style="margin-top:20px;">← Back to Orders</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CANCEL CONFIRM MODAL ══ -->
+<div id="cancelModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:none;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:var(--radius);padding:32px;max-width:400px;width:90%;box-shadow:var(--shadow-lg);text-align:center;">
+    <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:800;margin-bottom:10px;">Cancel this order?</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:24px;">This action cannot be undone. Your order will be cancelled and stock will be restored.</p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="closeCancelModal()">Keep Order</button>
+      <button class="btn btn-danger" id="confirmCancelBtn" onclick="confirmCancel()">Yes, Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div><div class="footer-brand-logo"><div class="footer-logo-mark">C</div><div class="footer-logo-text">CandyCove</div></div><p class="footer-brand-desc">Not just candy, but a sweet escape.</p></div>
+      <div><div class="footer-col-title">Shop</div><a href="shop.html" class="footer-link">All Products</a></div>
+      <div><div class="footer-col-title">Account</div><a href="login.html" class="footer-link">Sign In</a><a href="orders.html" class="footer-link">My Orders</a></div>
+      <div><div class="footer-col-title">Help</div><a class="footer-link">Shipping</a><a class="footer-link">Returns</a></div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 CandyCove. All rights reserved.</span></div>
+  </div>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="app.js"></script>
+<script>
+  let currentStatus  = '';
+  let currentPage    = 1;
+  let searchTimer    = null;
+  let currentOrderId = null; // tracks which order is open in detail view
+
+  const statusConfig = {
+    pending:    { label: '⏳ Pending',    cls: 'status-pending' },
+    processing: { label: '⚙️ Processing', cls: 'status-processing' },
+    delivered:  { label: '✅ Delivered',  cls: 'status-delivered' },
+    cancelled:  { label: '❌ Cancelled',  cls: 'status-cancelled' },
+  };
+
+  function getProductImage(p) {
+    if (!p.images || p.images.length === 0) return null;
+    const primary = p.images.find(img => img.is_primary == 1);
+    return primary?.url || p.images[0]?.url || null;
+  }
+
+  // ── Init ──
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!getToken()) {
+      // Show guest gate instead of redirecting
+      document.getElementById('guestGate').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('view-list').style.display = 'block';
+    await loadOrders();
+    await updateCartBadge();
+  });
+
+  // ── Load orders ──
+  async function loadOrders(page = 1) {
+    currentPage = page;
+    document.getElementById('ordersLoading').style.display = 'block';
+    document.getElementById('ordersList').innerHTML = '';
+    document.getElementById('ordersEmpty').style.display = 'none';
+
+    const params = new URLSearchParams();
+    if (currentStatus) params.append('status', currentStatus);
+    const search = document.getElementById('orderSearch').value.trim();
+    if (search) params.append('search', search);
+    params.append('page', page);
+
+    const res = await apiFetch(`/orders?${params.toString()}`);
+    document.getElementById('ordersLoading').style.display = 'none';
+
+    if (!res.ok) { showToast('Failed to load orders', 'error'); return; }
+
+    const orders = res.data.data || [];
+    if (orders.length === 0) {
+      document.getElementById('ordersEmpty').style.display = 'block';
+      document.getElementById('ordersPagination').innerHTML = '';
+      return;
+    }
+
+    renderOrders(orders);
+    renderPagination(res.data);
+  }
+
+  // ── Render order cards ──
+  function renderOrders(orders) {
+    const list = document.getElementById('ordersList');
+    list.innerHTML = orders.map(order => {
+      const status   = statusConfig[order.status] || { label: order.status, cls: '' };
+      const date     = new Date(order.ordered_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+      const products = order.products || [];
+
+      const thumbs = products.slice(0, 3).map(p => {
+        const imgUrl = getProductImage(p);
+        return imgUrl
+          ? `<div class="order-prod-thumb" style="overflow:hidden;"><img src="${imgUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;"></div>`
+          : `<div class="order-prod-thumb">🍬</div>`;
+      }).join('');
+
+      const extra = products.length > 3
+        ? `<div style="width:46px;height:46px;border-radius:10px;background:var(--cream-deep);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);">+${products.length - 3}</div>`
+        : '';
+
+      const totalItems = products.reduce((sum, p) => sum + (p.pivot?.quantity || 1), 0);
+
+      return `
+        <div class="order-card" onclick="showDetail(${order.id})">
+          <div class="order-card-header">
+            <div>
+              <div class="order-id">Order #${order.id}</div>
+              <div class="order-date">${date}</div>
+            </div>
+            <span class="${status.cls}">${status.label}</span>
+          </div>
+          <div class="order-products-preview">${thumbs}${extra}</div>
+          <div class="order-card-footer">
+            <div style="font-size:14px;color:var(--muted);">${totalItems} item${totalItems !== 1 ? 's' : ''}</div>
+            <div class="order-total">$${parseFloat(order.total_amount || 0).toFixed(2)}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Show order detail ──
+  async function showDetail(orderId) {
+    currentOrderId = orderId;
+    document.getElementById('view-list').style.display   = 'none';
+    document.getElementById('view-detail').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('detailItemsList').innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);">Loading...</div>';
+    document.getElementById('cancelOrderBtn').style.display = 'none';
+
+    const res = await apiFetch(`/orders/${orderId}`);
+    if (!res.ok) { showToast('Failed to load order details', 'error'); return; }
+
+    const order  = res.data;
+    const status = statusConfig[order.status] || { label: order.status, cls: '' };
+    const date   = new Date(order.ordered_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+    document.getElementById('detailOrderId').textContent      = `Order #${order.id}`;
+    document.getElementById('detailOrderTitle').textContent   = `Order #${order.id}`;
+    document.getElementById('detailStatusBadge').textContent  = status.label;
+    document.getElementById('detailStatusBadge').className    = status.cls;
+    document.getElementById('detailSummaryId').textContent    = `#${order.id}`;
+    document.getElementById('detailSummaryDate').textContent  = date;
+    document.getElementById('detailSummaryItems').textContent = `${order.products?.length || 0} products`;
+    document.getElementById('detailSummaryTotal').textContent = `$${parseFloat(order.total_amount || 0).toFixed(2)}`;
+
+    // Show cancel button only for pending orders
+    if (order.status === 'pending') {
+      document.getElementById('cancelOrderBtn').style.display = 'inline-flex';
+    }
+
+    const addr = order.address;
+    document.getElementById('detailAddress').innerHTML = addr
+      ? `${addr.street}, ${addr.building_no}${addr.appartment_no ? ', Apt ' + addr.appartment_no : ''}<br>${addr.city} · ${addr.phone}`
+      : 'N/A';
+
+    // Items
+    const items = order.products || [];
+    document.getElementById('detailItemsList').innerHTML = items.map(p => {
+      const imgUrl  = getProductImage(p);
+      const imgHtml = imgUrl
+        ? `<img src="${imgUrl}" alt="${p.name}" style="width:54px;height:54px;object-fit:cover;border-radius:8px;flex-shrink:0;">`
+        : `<div style="width:54px;height:54px;border-radius:8px;background:var(--magenta-pale);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🍬</div>`;
+      const qty      = p.pivot?.quantity || 1;
+      const price    = parseFloat(p.pivot?.price_at_order || p.price);
+      const subtotal = (price * qty).toFixed(2);
+      return `
+        <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--cream-deep);border-radius:var(--radius-sm);margin-bottom:10px;">
+          ${imgHtml}
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px;">${p.name}</div>
+            <div style="font-size:13px;color:var(--muted);">Qty: ${qty} × $${price.toFixed(2)}</div>
+          </div>
+          <div style="font-weight:700;font-size:15px;color:var(--magenta);">$${subtotal}</div>
+        </div>`;
+    }).join('');
+
+    // Timeline
+    const isCancelled = order.status === 'cancelled';
+    const steps = [
+      { key: 'pending',    label: 'Order Placed', time: order.ordered_at },
+      { key: 'processing', label: 'Processing',   time: null },
+      { key: 'delivered',  label: 'Delivered',    time: order.delivered_at },
+    ];
+    const statusOrder = ['pending', 'processing', 'delivered'];
+    const currentIdx  = isCancelled ? 0 : statusOrder.indexOf(order.status);
+
+    let timelineHtml = steps.map((step, i) => {
+      const done = !isCancelled && i <= currentIdx;
+      const time = step.time
+        ? new Date(step.time).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' })
+        : '—';
+      return `
+        <div class="timeline-item">
+          <div class="timeline-dot ${done ? 'done' : ''}">${done ? '✓' : ''}</div>
+          <div class="timeline-text">
+            <div class="timeline-label">${step.label}</div>
+            <div class="timeline-time">${time}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    if (isCancelled) {
+      timelineHtml += `
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:var(--magenta);color:white;">✕</div>
+          <div class="timeline-text">
+            <div class="timeline-label" style="color:var(--magenta);">Order Cancelled</div>
+            <div class="timeline-time">—</div>
+          </div>
+        </div>`;
+    }
+
+    document.getElementById('detailTimeline').innerHTML = timelineHtml;
+  }
+
+  // ── Cancel order ──
+  function cancelOrder() {
+    const modal = document.getElementById('cancelModal');
+    modal.style.display = 'flex';
+  }
+
+  function closeCancelModal() {
+    document.getElementById('cancelModal').style.display = 'none';
+  }
+
+  async function confirmCancel() {
+    const btn = document.getElementById('confirmCancelBtn');
+    btn.disabled = true;
+    btn.textContent = 'Cancelling...';
+
+    const res = await apiFetch(`/orders/${currentOrderId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ status: 'cancelled' })
+    });
+
+    closeCancelModal();
+    btn.disabled = false;
+    btn.textContent = 'Yes, Cancel';
+
+    if (res.ok) {
+      showToast('Order cancelled successfully', 'success');
+      // Reload detail view to reflect new status
+      await showDetail(currentOrderId);
+    } else {
+      showToast(res.data.message || 'Failed to cancel order', 'error');
+    }
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('cancelModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCancelModal();
+  });
+
+  function showList() {
+    document.getElementById('view-list').style.display   = 'block';
+    document.getElementById('view-detail').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    loadOrders(currentPage); // refresh list in case status changed
+  }
+
+  function filterByStatus(status, btn) {
+    currentStatus = status;
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    loadOrders(1);
+  }
+
+  function debounceSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadOrders(1), 500);
+  }
+
+  function renderPagination(meta) {
+    const container = document.getElementById('ordersPagination');
+    if (!meta || meta.last_page <= 1) { container.innerHTML = ''; return; }
+    let html = '';
+    for (let i = 1; i <= meta.last_page; i++) {
+      html += `<button onclick="loadOrders(${i})"
+        style="width:36px;height:36px;border-radius:50%;border:2px solid ${i === currentPage ? 'var(--magenta)' : 'var(--border-soft)'};
+        background:${i === currentPage ? 'var(--magenta)' : 'white'};
+        color:${i === currentPage ? 'white' : 'var(--text)'};font-weight:600;cursor:pointer;">${i}</button>`;
+    }
+    container.innerHTML = html;
+  }
+</script>
+</body>
+</html>
