@@ -78,7 +78,7 @@ class ProductController extends Controller implements HasMiddleware
             'stock' => 'required|integer',
             'is_active' => 'required|in:0,1',
             'category_id' => 'required|exists:categories,id',
-            'images' => 'required|array',
+            'images' => ($request->isMethod('POST') && !$request->input('_method') ? 'required' : 'nullable') . '|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,webp,jfif|max:2048',
         ]);
 

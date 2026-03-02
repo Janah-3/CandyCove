@@ -24,7 +24,7 @@ class order extends Model
     }
 
     function address(){
-        return $this->belongsTo(Address::class);
+        return $this->belongsTo(address::class);
     }
     function products(){
         return $this->belongsToMany(product::class)->withPivot('quantity', 'price_at_order');
