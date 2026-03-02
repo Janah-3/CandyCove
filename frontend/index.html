@@ -308,45 +308,44 @@
   }
 
   // ── Hero card ──
-  function renderHeroCard(p) {
+ async function loadTrending() {
+    const res = await apiFetch('/products?page=1');
+    document.getElementById('trendingLoading').style.display = 'none';
+    if (!res.ok) return;
 
-  const currentUser = getUser();
-  const isAdmin = currentUser && currentUser.role === 'admin';
+    const products = (res.data.data || []).slice(0, 6);
 
-  const imgUrl =
-    p.images?.find(i => i.is_primary === 1)?.url ||
-    p.images?.[0]?.url ||
-    '';
+    // Fetch product 10 for hero card
+    const heroRes = await apiFetch('/products/10');
+    if (heroRes.ok) {
+      heroProduct = heroRes.data.product;
+      heroProduct.images = heroRes.data.images;
+    } else {
+      heroProduct = products[0] || null;
+    }
+    if (heroProduct) renderHeroCard(heroProduct);
 
-  document.getElementById('heroProductCard').innerHTML = `
-    <div style="height:68%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--magenta-pale),var(--lavender-pale));">
-      ${imgUrl
+    if (products.length === 0) return;
+
+    const scroll = document.getElementById('trendingScroll');
+    scroll.style.display = 'flex';
+    scroll.innerHTML = products.map(p => {
+      const imgUrl = p.images?.find(i => i.is_primary === 1)?.url || p.images?.[0]?.url || '';
+      const imgHtml = imgUrl
         ? `<img src="${imgUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">`
-        : `<span style="font-size:80px;">🍬</span>`}
-    </div>
-    <div style="padding:20px;">
-      <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;">
-        ${p.name}
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-        <span style="font-size:22px;font-weight:700;color:var(--magenta);">
-          $${parseFloat(p.price).toFixed(2)}
-        </span>
-        ${
-          isAdmin
-            ? `<button class="btn btn-primary btn-sm" disabled
-                 style="opacity:0.5;cursor:not-allowed;">
-                 Admin Mode
-               </button>`
-            : `<button class="btn btn-primary btn-sm"
-                 onclick="heroAddToCart()">
-                 Add to Cart
-               </button>`
-        }
-      </div>
-    </div>
-  `;
-}
+        : `<span style="font-size:40px;">🍬</span>`;
+      return `
+        <a href="product.html?id=${p.id}" class="trending-card">
+          <div class="trending-card-img" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">
+            ${imgHtml}
+          </div>
+          <div class="trending-card-body">
+            <div class="trending-card-name">${p.name}</div>
+            <div class="trending-card-price">$${parseFloat(p.price).toFixed(2)}</div>
+          </div>
+        </a>`;
+    }).join('');
+  }
 
   async function heroAddToCart() {
     if (!heroProduct) return;
