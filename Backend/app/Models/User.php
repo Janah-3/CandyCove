@@ -59,10 +59,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(order::class);
     }
 
-     public function sendEmailVerificationNotification(): void
-    {
-        $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
-    }
+    public function sendEmailVerificationNotification(): void
+{
+    $this->notify(new VerifyEmailNotification());
+}
+
+    public function sendPasswordResetNotification($token)
+{
+    $this->notify(new ResetPasswordNotification($token));
+}
 
     
 }
