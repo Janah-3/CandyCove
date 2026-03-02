@@ -105,16 +105,33 @@
   document.addEventListener('DOMContentLoaded', async () => {
     // Already logged in
     if (getToken()) {
+    const user = getUser();
 
-  const user = getUser(); // 👈 get stored user
-
-  if (user && user.role === 'admin') {
-    window.location.href = 'admin.html';
-  } else {
-    window.location.href = 'index.html';
-  }
+    // If we have both token AND user data, redirect
+    if (user && user.role === 'admin') {
+      window.location.href = 'admin.html';
+      return;
+    } else if (user && user.role === 'customer') {
+      window.location.href = 'index.html';
       return;
     }
+
+    // Token exists but no user data — verify token with backend
+    const res = await apiFetch('/user');
+    if (res.ok && res.data) {
+      setUser(res.data);
+      if (res.data.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'index.html';
+      }
+      return;
+    } else {
+      // Token is invalid/expired — clear everything and stay on login
+      removeToken();
+      localStorage.removeItem('cc_user');
+    }
+  }
 
     // Try remember token auto-login
     const rememberToken = getRememberToken();
