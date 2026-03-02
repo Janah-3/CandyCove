@@ -12,7 +12,7 @@ class ResetPasswordNotification extends ResetPassword
 {
     public function toMail($notifiable)
     {
-        $url = env('FRONTEND_URL') . '/forgot-password.html?token=' . $this->token . '&email=' . urlencode($notifiable->email);
+        $url = env('FRONTEND_URL') . 'forgot-password.html?token=' . $this->token . '&email=' . urlencode($notifiable->email);
 
         return (new MailMessage)
             ->subject('Reset Your CandyCove Password 🍬')
