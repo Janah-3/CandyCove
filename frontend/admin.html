@@ -164,8 +164,31 @@
                   <option value="0">Inactive</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">Images</label><input type="file" class="form-control" id="pImages" multiple accept="image/*"></div>
             </div>
+
+            <!-- ── Multi-Image Upload ── -->
+            <div class="form-group">
+              <label class="form-label">Images <span style="color:var(--muted);font-weight:400;font-size:12px;">(first image = primary)</span></label>
+
+              <!-- Drop Zone -->
+              <div id="imageDropZone"
+                onclick="document.getElementById('pImages').click()"
+                ondragover="event.preventDefault();this.style.borderColor='var(--magenta)';this.style.background='var(--magenta-pale)';"
+                ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--cream)';"
+                ondrop="handleImageDrop(event)"
+                style="border:2px dashed var(--border);border-radius:var(--radius);padding:32px 24px;text-align:center;cursor:pointer;transition:var(--transition);background:var(--cream);">
+                <div style="font-size:36px;margin-bottom:8px;">📸</div>
+                <div style="font-size:14px;font-weight:600;color:var(--text);">Click to select or drag & drop images</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:6px;">JPEG, PNG, WEBP, JFIF — max 2MB each · multiple allowed</div>
+              </div>
+
+              <!-- Hidden file input -->
+              <input type="file" id="pImages" multiple accept="image/*" style="display:none;" onchange="handleImageSelect(this.files)">
+
+              <!-- Previews -->
+              <div id="imagePreviews" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;"></div>
+            </div>
+
             <div style="display:flex;gap:10px;">
               <button class="btn btn-primary" onclick="submitProduct()">Save Product</button>
               <button class="btn btn-ghost" onclick="toggleProductForm()">Cancel</button>
@@ -223,16 +246,17 @@
 <div class="toast-container" id="toastContainer"></div>
 <script src="app.js"></script>
 <script>
-  let adminOrdersPage = 1;
+  let adminOrdersPage  = 1;
   let adminProductsPage = 1;
   let orderSearchTimer = null;
-  let adminCategories = [];
+  let adminCategories  = [];
+  let selectedFiles    = [];   // ← holds File objects for upload
 
   const statusConfig = {
-    pending:   { label: '⏳ Pending',   cls: 'status-pending' },
+    pending:    { label: '⏳ Pending',    cls: 'status-pending' },
     processing: { label: '⚙️ Processing', cls: 'status-processing' },
-    delivered: { label: '✅ Delivered', cls: 'status-delivered' },
-    cancelled: { label: '❌ Cancelled', cls: 'status-cancelled' },
+    delivered:  { label: '✅ Delivered',  cls: 'status-delivered' },
+    cancelled:  { label: '❌ Cancelled',  cls: 'status-cancelled' },
   };
 
   // ── Init ──
@@ -242,8 +266,6 @@
     console.log('Authenticated user:', user);
     if (!user || user.role !== 'admin') {
       console.log('Access denied: Admins only');
-
-      // window.location.href = 'index.html';
       return;
     }
     document.getElementById('adminName').textContent = user.name?.split(' ')[0] || 'Admin';
@@ -267,8 +289,8 @@
     ]);
 
     if (ordersRes.ok) {
-      const orders = ordersRes.data.data || [];
-      const total  = ordersRes.data.total || 0;
+      const orders  = ordersRes.data.data || [];
+      const total   = ordersRes.data.total || 0;
       const pending = orders.filter(o => o.status === 'pending').length;
       const revenue = orders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
 
@@ -282,10 +304,9 @@
         badge.style.display = 'inline-flex';
       }
 
-      // Recent orders table
       document.getElementById('dashboardRecentOrders').innerHTML = orders.slice(0, 5).map(order => {
         const status = statusConfig[order.status] || { label: order.status, cls: '' };
-        const date = new Date(order.ordered_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+        const date   = new Date(order.ordered_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
         return `<tr>
           <td><strong>#${order.id}</strong></td>
           <td><strong style="color:var(--magenta)">$${parseFloat(order.total_amount || 0).toFixed(2)}</strong></td>
@@ -323,8 +344,8 @@
     }
 
     document.getElementById('adminOrdersTable').innerHTML = orders.map(order => {
-      const status = statusConfig[order.status] || { label: order.status, cls: '' };
-      const date = new Date(order.ordered_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+      const status    = statusConfig[order.status] || { label: order.status, cls: '' };
+      const date      = new Date(order.ordered_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
       const itemCount = order.products?.length || 0;
       return `<tr>
         <td><strong>#${order.id}</strong></td>
@@ -407,11 +428,14 @@
     if (clear) {
       document.getElementById('productFormTitle').textContent = 'Add New Product';
       document.getElementById('editProductId').value = '';
-      document.getElementById('pName').value = '';
-      document.getElementById('pPrice').value = '';
-      document.getElementById('pStock').value = '';
+      document.getElementById('pName').value   = '';
+      document.getElementById('pPrice').value  = '';
+      document.getElementById('pStock').value  = '';
       document.getElementById('pActive').value = '1';
       document.getElementById('pImages').value = '';
+      // Clear image previews
+      selectedFiles = [];
+      renderImagePreviews();
     }
     // Populate category dropdown
     const select = document.getElementById('pCategory');
@@ -421,14 +445,71 @@
   function editProduct(id, name, price, stock, categoryId, isActive) {
     document.getElementById('productFormTitle').textContent = 'Edit Product';
     document.getElementById('editProductId').value = id;
-    document.getElementById('pName').value = name;
-    document.getElementById('pPrice').value = price;
-    document.getElementById('pStock').value = stock;
+    document.getElementById('pName').value   = name;
+    document.getElementById('pPrice').value  = price;
+    document.getElementById('pStock').value  = stock;
     document.getElementById('pActive').value = isActive;
     const select = document.getElementById('pCategory');
     select.innerHTML = adminCategories.map(c => `<option value="${c.id}" ${c.id == categoryId ? 'selected' : ''}>${c.name}</option>`).join('');
+    // Clear previously selected files when editing
+    selectedFiles = [];
+    renderImagePreviews();
     document.getElementById('productForm').style.display = 'block';
     document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ── Multi-image helpers ──
+  function handleImageSelect(files) {
+    for (const file of files) {
+      selectedFiles.push(file);
+    }
+    // Reset the input so the same file can be added again if needed
+    document.getElementById('pImages').value = '';
+    renderImagePreviews();
+  }
+
+  function handleImageDrop(event) {
+    event.preventDefault();
+    const zone = document.getElementById('imageDropZone');
+    zone.style.borderColor = 'var(--border)';
+    zone.style.background  = 'var(--cream)';
+    handleImageSelect(event.dataTransfer.files);
+  }
+
+  function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    renderImagePreviews();
+  }
+
+  function renderImagePreviews() {
+    const container = document.getElementById('imagePreviews');
+    if (selectedFiles.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+    container.innerHTML = selectedFiles.map((file, i) => {
+      const url = URL.createObjectURL(file);
+      return `
+        <div style="position:relative;width:80px;height:80px;flex-shrink:0;">
+          <img src="${url}" alt="preview"
+            style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-sm);
+                   border:2px solid ${i === 0 ? 'var(--magenta)' : 'var(--border)'};
+                   display:block;">
+          ${i === 0
+            ? `<div style="position:absolute;bottom:0;left:0;right:0;
+                           background:var(--magenta);color:white;font-size:9px;
+                           text-align:center;padding:2px 0;font-weight:700;letter-spacing:.04em;
+                           border-radius:0 0 var(--radius-sm) var(--radius-sm);">PRIMARY</div>`
+            : ''}
+          <button onclick="removeImage(${i})"
+            title="Remove"
+            style="position:absolute;top:-7px;right:-7px;width:20px;height:20px;
+                   border-radius:50%;background:#e53935;color:white;border:none;
+                   cursor:pointer;font-size:13px;line-height:1;
+                   display:flex;align-items:center;justify-content:center;
+                   box-shadow:0 1px 4px rgba(0,0,0,.25);">×</button>
+        </div>`;
+    }).join('');
   }
 
   async function submitProduct() {
@@ -438,33 +519,34 @@
     const stock    = document.getElementById('pStock').value;
     const category = document.getElementById('pCategory').value;
     const isActive = document.getElementById('pActive').value;
-    const files    = document.getElementById('pImages').files;
 
     if (!name || !price || !stock || !category) {
       showToast('Please fill in all required fields', 'error');
       return;
     }
 
-    // Use FormData for file upload
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('price', price);
-    formData.append('stock', stock);
-    formData.append('category_id', category);
-    formData.append('is_active', isActive);
-    for (let i = 0; i < files.length; i++) {
-      formData.append('images[]', files[i]);
+    // Require at least one image for new products
+    if (!id && selectedFiles.length === 0) {
+      showToast('Please add at least one image', 'error');
+      return;
     }
 
-    const token = getToken();
-    const url   = id ? `${API_BASE}/products/${id}` : `${API_BASE}/products`;
-    const method = id ? 'POST' : 'POST';
+    const formData = new FormData();
+    formData.append('name',        name);
+    formData.append('price',       price);
+    formData.append('stock',       stock);
+    formData.append('category_id', category);
+    formData.append('is_active',   isActive);
+    for (let i = 0; i < selectedFiles.length; i++) {
+      formData.append('images[]', selectedFiles[i]);
+    }
 
-    // For update with files we need to use POST with _method override
-    if (id) formData.append('_method', 'PUT');
+    const token  = getToken();
+    const url    = id ? `${API_BASE}/products/${id}` : `${API_BASE}/products`;
+    if (id) formData.append('_method', 'PUT');   // Laravel method spoofing
 
-    const res = await fetch(url, {
-      method,
+    const res  = await fetch(url, {
+      method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
       body: formData
     });
@@ -585,7 +667,6 @@
     const title = document.getElementById('topbarTitle');
     if (title && sectionTitles[id]) title.textContent = sectionTitles[id];
 
-    // Lazy load sections
     if (id === 'nav-orders')     loadAdminOrders(1);
     if (id === 'nav-products')   loadAdminProducts(1);
     if (id === 'nav-categories') loadAdminCategories();

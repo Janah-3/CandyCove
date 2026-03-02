@@ -18,13 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
 
-        $middleware->alias([
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
-        ]);
-        
-         $middleware->alias([
-        'checkRole' => \App\Http\Middleware\CheckRole::class,
-    ]);
+       $middleware->alias([
+    'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+    'checkRole' => \App\Http\Middleware\checkRole::class,
+]);
 
         //
     })

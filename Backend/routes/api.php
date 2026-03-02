@@ -8,6 +8,7 @@ use \App\Http\Controllers\CartController;
 use \App\Http\Controllers\OrderController;
 use \App\Http\Controllers\categoryController;
 use \App\Http\Controllers\addressController;
+use App\Http\Middleware\checkRole;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
@@ -51,6 +52,7 @@ Route::middleware(['auth:sanctum', 'throttle:20,1'])->group(function () {
 
 // Category routes 
 Route::apiResource('/categories', categoryController::class);
+
 
 //Address routes 
 Route::middleware(['auth:sanctum', 'checkRole:customer'])->apiResource('/addresses', addressController::class);
