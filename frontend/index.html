@@ -3,402 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CandyCove — Not Just Candy, But a Sweet Escape</title>
+<title>CandyCove — Sweet Escape</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="app"></div>
 
-<div class="cursor-outer" id="cursorOuter"></div>
-<div class="cursor-dot"   id="cursorDot"></div>
+  <!-- ══ Cursor Elements ══ -->
+  <div class="cursor-outer" id="cursorOuter"></div>
+  <div class="cursor-dot"   id="cursorDot"></div>
 
-<!-- ══ NAVBAR ══ -->
-<nav class="navbar">
-  <div class="container navbar-inner">
-    <a href="index.html" class="nav-logo">
-      <div class="nav-logo-mark">C</div>
-      <div>
-        <div class="nav-logo-text">CandyCove</div>
-        <div class="nav-logo-sub">not just candy, but a sweet escape</div>
-      </div>
-    </a>
-    <div class="nav-links">
-      <a href="index.html"   class="nav-link active">Home</a>
-      <a href="shop.html"    class="nav-link">Shop</a>
-      <a href="orders.html"  class="nav-link">My Orders</a>
-    </div>
-    <div class="nav-actions">
-      <a href="cart.html" class="nav-icon-btn" title="Cart">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-        <span class="cart-badge" id="cartBadge">0</span>
+  <!-- ══ Navbar ══ -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-mark">C</div>
+        <div>
+          <div class="nav-logo-text">CandyCove</div>
+          <div class="nav-logo-sub">not just candy, but a sweet escape</div>
+        </div>
       </a>
-      <a href="login.html" class="btn-nav-user" id="navAuthBtn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Sign In
-      </a>
-    </div>
-  </div>
-</nav>
-
-<!-- ══ HERO ══ -->
-<section style="position:relative;overflow:hidden;min-height:90vh;display:flex;align-items:center;background:var(--cream);">
-  <div style="position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(196,56,107,.09) 0%,transparent 70%);border-radius:50%;top:-200px;right:-150px;pointer-events:none;"></div>
-  <div style="position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(91,191,181,.08) 0%,transparent 70%);border-radius:50%;bottom:-100px;left:-100px;pointer-events:none;"></div>
-  <div style="position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(240,192,58,.10) 0%,transparent 70%);border-radius:50%;top:35%;left:42%;pointer-events:none;"></div>
-
-  <div class="container" style="position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding-top:80px;padding-bottom:80px;">
-    <div class="fade-up">
-      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--yellow-pale);padding:6px 14px;border-radius:var(--radius-pill);font-size:12px;font-weight:500;color:var(--yellow-deep);letter-spacing:.08em;margin-bottom:20px;">
-        <span>✦</span> New arrivals just dropped
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="orders.html" class="nav-link">My Orders</a>
       </div>
-      <h1 style="font-size:clamp(44px,6vw,72px);font-weight:900;line-height:1.06;margin-bottom:22px;">
-        Sweet Treats<br>for <em style="font-style:italic;color:var(--magenta);">Every</em><br>Craving
-      </h1>
-      <p style="font-size:17px;color:var(--text-mid);font-weight:300;line-height:1.7;margin-bottom:36px;max-width:440px;">
-        Discover a world of premium artisan candies, chocolates and confections. Handpicked with love, delivered with joy.
-      </p>
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <a href="shop.html" id="shopNowBtn" class="btn btn-primary btn-lg">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
-          Shop Now
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-icon-btn" title="Cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-badge" id="cartBadge">0</span>
         </a>
-        <a href="shop.html" id="exploreBtn" class="btn btn-outline btn-lg">Explore Collection</a>
-      </div>
-      <div style="margin-top:40px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--magenta-pale);display:flex;align-items:center;justify-content:center;font-size:14px;">🚚</div> Free delivery over $50
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--yellow-pale);display:flex;align-items:center;justify-content:center;font-size:14px;">⭐</div> 4.9 rating
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);">
-          <div style="width:32px;height:32px;border-radius:50%;background:var(--teal-pale);display:flex;align-items:center;justify-content:center;font-size:14px;">🎁</div> Gift wrapping
-        </div>
+        <a href="login.html" class="btn-nav-user" id="navAuthBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          Sign In
+        </a>
       </div>
     </div>
+  </nav>
 
-    <!-- Hero product card -->
-    <div class="fade-up-2" style="position:relative;display:flex;align-items:center;justify-content:center;">
-      <div style="position:absolute;top:-16px;right:-16px;width:110px;height:110px;background:var(--yellow-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:var(--shadow-sm);animation:floatY 3s ease-in-out infinite;">🍭</div>
-      <div id="heroProductCard" style="width:340px;height:420px;background:white;border-radius:28px;box-shadow:var(--shadow-lg);overflow:hidden;transform:rotate(2deg);transition:var(--transition);" onmouseenter="this.style.transform='rotate(0deg) scale(1.02)'" onmouseleave="this.style.transform='rotate(2deg)'">
-        <div style="height:68%;background:linear-gradient(145deg,var(--magenta-pale),var(--lavender-pale));display:flex;align-items:center;justify-content:center;font-size:80px;">🍬</div>
-        <div style="padding:20px;">
-          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:6px;">Loading...</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-            <span style="font-size:22px;font-weight:700;color:var(--magenta);">—</span>
-            <button class="btn btn-primary btn-sm" onclick="heroAddToCart()">Add to Cart</button>
+  <!-- ══ App JS ── -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const path = window.location.pathname;
+
+        if(path.includes('forgot-password')) {
+            loadForgotPasswordUI();
+        } else if(path.includes('reset-password')) {
+            // Grab token and email from query params
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const email = params.get('email');
+
+            if(token && email) {
+                localStorage.setItem('resetToken', token);
+                localStorage.setItem('resetEmail', email);
+            }
+            loadResetPasswordUI();
+        }
+    });
+
+    // ── Forgot Password UI ──
+    function loadForgotPasswordUI() {
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <div class="auth-page">
+            <div class="auth-form-panel">
+              <div class="auth-form-title">Forgot Password</div>
+              <div class="auth-form-sub" style="margin-bottom:20px;">
+                Enter your email and we'll send you a reset link.
+              </div>
+              <div id="successAlert" class="alert alert-success" style="display:none;margin-bottom:16px;">
+                <span>✅</span> Reset link sent! Check your inbox.
+              </div>
+              <div id="errorAlert" class="alert alert-error" style="display:none;margin-bottom:16px;">
+                <span>⚠️</span> <span id="errorMsg">Email not found.</span>
+              </div>
+              <div class="form-stack">
+                <div class="form-group">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" id="forgotEmail" class="form-control" placeholder="hello@candycove.com">
+                </div>
+                <button class="btn btn-primary w-full btn-lg" onclick="sendReset()">Send Reset Link</button>
+                <button class="btn btn-ghost w-full" onclick="loadHomePage()">← Back to Home</button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div style="position:absolute;bottom:20px;left:-30px;width:85px;height:85px;background:var(--teal-pale);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:var(--shadow-sm);animation:floatY 3s ease-in-out 1.2s infinite;">🍫</div>
-      <div style="position:absolute;top:40%;right:-40px;width:70px;height:70px;background:var(--lavender-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:var(--shadow-sm);animation:floatY 3s ease-in-out 0.6s infinite;">🍡</div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ MARQUEE ══ -->
-<div class="marquee-strip">
-  <div class="marquee-track">
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Premium Artisan Candy</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Free Gift Wrapping</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> 100+ Flavors</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Same Day Dispatch</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Worldwide Shipping</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Freshly Crafted Daily</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Premium Artisan Candy</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Free Gift Wrapping</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> 100+ Flavors</span>
-    <span class="marquee-item"><span class="marquee-dot">✦</span> Same Day Dispatch</span>
-  </div>
-</div>
-
-<!-- ══ FEATURES ══ -->
-<section class="section">
-  <div class="container">
-    <div class="section-header center">
-      <span class="section-eyebrow">Why choose us</span>
-      <h2 class="section-title">The CandyCove Difference</h2>
-      <p class="section-sub">We believe every sweet moment deserves to be extraordinary. That's why we obsess over every detail.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon magenta">🍭</div>
-        <div class="feature-title">Artisan Quality</div>
-        <p class="feature-desc">Every product is handpicked from world-class confectioners using only the finest natural ingredients.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon yellow">🚚</div>
-        <div class="feature-title">Swift Delivery</div>
-        <p class="feature-desc">Orders placed before 3pm are dispatched same day with premium temperature-controlled packaging.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon teal">🎁</div>
-        <div class="feature-title">Beautiful Gifting</div>
-        <p class="feature-desc">Every order comes in our signature gift box. Add a personal message for that extra special touch.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ TRENDING ══ -->
-<section class="section" style="background:white;border-top:1px solid var(--border-soft);border-bottom:1px solid var(--border-soft);">
-  <div class="container">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:16px;">
-      <div>
-        <span class="section-eyebrow">Bestsellers</span>
-        <h2 class="section-title">Trending Right Now</h2>
-      </div>
-      <a href="shop.html" class="btn btn-outline btn-sm">View All →</a>
-    </div>
-    <div id="trendingLoading" style="text-align:center;padding:40px;color:var(--muted);">Loading treats... 🍬</div>
-    <div class="trending-scroll" id="trendingScroll" style="display:none;"></div>
-  </div>
-</section>
-
-<!-- ══ CATEGORIES ══ -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow">Explore</span>
-      <h2 class="section-title">Shop by Category</h2>
-    </div>
-    <div id="categoriesGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;"></div>
-  </div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-  <div class="container">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand-logo">
-          <div class="footer-logo-mark">C</div>
-          <div class="footer-logo-text">CandyCove</div>
-        </div>
-        <p class="footer-brand-desc">Not just candy, but a sweet escape. Bringing joy through premium confections since 2024.</p>
-      </div>
-      <div>
-        <div class="footer-col-title">Shop</div>
-        <a href="shop.html" class="footer-link">All Products</a>
-        <a href="shop.html" class="footer-link">Gummies</a>
-        <a href="shop.html" class="footer-link">Chocolates</a>
-        <a href="shop.html" class="footer-link">Gift Sets</a>
-      </div>
-      <div>
-        <div class="footer-col-title">Account</div>
-        <a href="login.html"    class="footer-link">Sign In</a>
-        <a href="register.html" class="footer-link">Register</a>
-        <a href="orders.html"   class="footer-link">My Orders</a>
-        <a href="cart.html"     class="footer-link">Cart</a>
-      </div>
-      <div>
-        <div class="footer-col-title">Help</div>
-        <a class="footer-link">Shipping Policy</a>
-        <a class="footer-link">Returns</a>
-        <a class="footer-link">FAQ</a>
-        <a class="footer-link">Contact Us</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2025 CandyCove. All rights reserved.</span>
-      <div class="footer-social">
-        <div class="social-btn">𝕏</div>
-        <div class="social-btn">in</div>
-        <div class="social-btn">📷</div>
-        <div class="social-btn">🎵</div>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<div class="toast-container" id="toastContainer"></div>
-<script src="app.js"></script>
-<script>
-  let heroProduct = null;
-
-  // Static category images from Unsplash (free, no auth needed)
-  const categoryImages = {
-    'Gummies':    'https://images.unsplash.com/photo-1666274694243-9997eb427237?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGd1bW1pZXN8ZW58MHx8MHx8fDA%3Dhttps://images.unsplash.com/photo-1582058091597-4033bde9406b?w=400&h=300&fit=crop',
-    'Chocolate':  'https://images.unsplash.com/photo-1548907040-4baa42d10919?w=400&h=300&fit=crop',
-    'Lollipops':  'https://plus.unsplash.com/premium_photo-1671478394579-1662f9382bc5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8bG9saXBvcHxlbnwwfHwwfHx8MA%3D%3D',
-    'Gifts':      'https://media.istockphoto.com/id/488182109/photo/chocolates.webp?a=1&b=1&s=612x612&w=0&k=20&c=bfLjPMDiTkRjhgF09pyKd5wc6vvATUwTUf4OBO05Fm0=',
-    'Chips':      'https://images.unsplash.com/photo-1599490659101-963323d1da50?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGNoaXBzfGVufDB8fDB8fHww',
-    'Healthy':    'https://media.istockphoto.com/id/1309362830/photo/whey-protein-powder-in-measuring-scoop-and-different-energy-protein-bar-on-grey-background.webp?a=1&b=1&s=612x612&w=0&k=20&c=WG34ZslSyqEcwUYYgjRWzZpsfVdgNaTvTZCHxIi3H0I=',
-    'Drinks':     'https://images.unsplash.com/photo-1543364038-840000a90245?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fGp1aWNlJTIwYm90dGxlfGVufDB8fDB8fHww',
-    'Biscuits':   'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&h=300&fit=crop',
-  };
-
-  // Fallback gradient per index if category not in map
-  const fallbackGradients = [
-    'linear-gradient(135deg,var(--magenta-pale),var(--lavender-pale))',
-    'linear-gradient(135deg,var(--yellow-pale),var(--magenta-pale))',
-    'linear-gradient(135deg,var(--teal-pale),var(--lavender-pale))',
-    'linear-gradient(135deg,var(--lavender-pale),var(--teal-pale))',
-    'linear-gradient(135deg,var(--yellow-pale),var(--teal-pale))',
-    'linear-gradient(135deg,var(--magenta-pale),var(--teal-pale))',
-    'linear-gradient(135deg,var(--lavender-pale),var(--magenta-pale))',
-    'linear-gradient(135deg,var(--teal-pale),var(--yellow-pale))',
-  ];
-
-  document.addEventListener('DOMContentLoaded', async () => {
-
-  const currentUser = getUser();
-  const isAdmin = currentUser && currentUser.role === 'admin';
-
-  // Navbar greeting
-  if (currentUser) {
-    const btn = document.getElementById('navAuthBtn');
-    btn.textContent = `Hi, ${currentUser.name?.split(' ')[0]} 👋`;
-    btn.href = isAdmin ? 'admin.html' : 'orders.html';
-  }
-
-  // Disable shopping for admin
-  if (isAdmin) {
-    const shopBtn = document.getElementById('shopNowBtn');
-    const exploreBtn = document.getElementById('exploreBtn');
-
-    if (shopBtn) {
-      shopBtn.style.pointerEvents = 'none';
-      shopBtn.style.opacity = '0.5';
-      shopBtn.textContent = 'Admins cannot shop';
+        `;
     }
 
-    if (exploreBtn) {
-      exploreBtn.style.pointerEvents = 'none';
-      exploreBtn.style.opacity = '0.5';
+    // ── Reset Password UI ──
+    function loadResetPasswordUI() {
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <div class="auth-page">
+            <div class="auth-form-panel">
+              <div class="auth-form-title">Reset Password</div>
+              <div class="auth-form-sub" style="margin-bottom:20px;">
+                Enter your new password below.
+              </div>
+              <div id="resetError" class="alert alert-error" style="display:none;margin-bottom:16px;">
+                <span>⚠️</span> <span id="resetErrorMsg"></span>
+              </div>
+              <div class="form-stack">
+                <div class="form-group">
+                  <label class="form-label">New Password</label>
+                  <input type="password" id="newPass" class="form-control" placeholder="Minimum 8 characters">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Confirm Password</label>
+                  <input type="password" id="confPass" class="form-control" placeholder="Repeat password">
+                </div>
+                <button class="btn btn-primary w-full btn-lg" onclick="handleReset()">Reset Password</button>
+              </div>
+            </div>
+          </div>
+        `;
     }
-  }
 
-  await Promise.all([
-    loadTrending(),
-    loadCategories(),
-    updateCartBadge(),
-  ]);
-});
-
-  // ── Trending products ──
-  async function loadTrending() {
-    const res = await apiFetch('/products?page=1');
-    document.getElementById('trendingLoading').style.display = 'none';
-    if (!res.ok) return;
-
-    const products = (res.data.data || []).slice(0, 6);
-    if (products.length === 0) return;
-
-    heroProduct = products[0];
-    renderHeroCard(heroProduct);
-
-    const scroll = document.getElementById('trendingScroll');
-    scroll.style.display = 'flex';
-    scroll.innerHTML = products.map(p => {
-      const imgUrl = p.images?.find(i => i.is_primary === 1)?.url || p.images?.[0]?.url || '';
-      const imgHtml = imgUrl
-        ? `<img src="${imgUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">`
-        : `<span style="font-size:40px;">🍬</span>`;
-      return `
-        <a href="product.html?id=${p.id}" class="trending-card">
-          <div class="trending-card-img" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">
-            ${imgHtml}
-          </div>
-          <div class="trending-card-body">
-            <div class="trending-card-name">${p.name}</div>
-            <div class="trending-card-price">$${parseFloat(p.price).toFixed(2)}</div>
-          </div>
-        </a>`;
-    }).join('');
-  }
-
-  // ── Hero card ──
- async function loadTrending() {
-    const res = await apiFetch('/products?page=1');
-    document.getElementById('trendingLoading').style.display = 'none';
-    if (!res.ok) return;
-
-    const products = (res.data.data || []).slice(0, 6);
-
-    // Fetch product 10 for hero card
-    const heroRes = await apiFetch('/products/10');
-    if (heroRes.ok) {
-      heroProduct = heroRes.data.product;
-      heroProduct.images = heroRes.data.images;
-    } else {
-      heroProduct = products[0] || null;
+    // ── Back to Home ──
+    function loadHomePage() {
+        window.location.href = 'index.html';
     }
-    if (heroProduct) renderHeroCard(heroProduct);
 
-    if (products.length === 0) return;
+    // ── Send Forgot Password Request ──
+    async function sendReset() {
+        const email = document.getElementById('forgotEmail').value.trim();
+        if(!email) return alert('Enter your email');
 
-    const scroll = document.getElementById('trendingScroll');
-    scroll.style.display = 'flex';
-    scroll.innerHTML = products.map(p => {
-      const imgUrl = p.images?.find(i => i.is_primary === 1)?.url || p.images?.[0]?.url || '';
-      const imgHtml = imgUrl
-        ? `<img src="${imgUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">`
-        : `<span style="font-size:40px;">🍬</span>`;
-      return `
-        <a href="product.html?id=${p.id}" class="trending-card">
-          <div class="trending-card-img" style="overflow:hidden;display:flex;align-items:center;justify-content:center;">
-            ${imgHtml}
-          </div>
-          <div class="trending-card-body">
-            <div class="trending-card-name">${p.name}</div>
-            <div class="trending-card-price">$${parseFloat(p.price).toFixed(2)}</div>
-          </div>
-        </a>`;
-    }).join('');
-  }
+        const res = await fetch('/api/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
 
-  async function heroAddToCart() {
-    if (!heroProduct) return;
-    await addToCart(heroProduct.id, 1);
-  }
+        if(data.ok) {
+            document.getElementById('successAlert').style.display = 'block';
+            document.getElementById('errorAlert').style.display = 'none';
+        } else {
+            document.getElementById('errorAlert').style.display = 'block';
+            document.getElementById('successAlert').style.display = 'none';
+            document.getElementById('errorMsg').textContent = data.message;
+        }
+    }
 
-  // ── Categories with static images ──
-  async function loadCategories() {
-    const res = await apiFetch('/categories');
-    if (!res.ok) return;
+    // ── Handle Reset Password ──
+    async function handleReset() {
+        const newPass = document.getElementById('newPass').value;
+        const confPass = document.getElementById('confPass').value;
 
-    const categories = res.data.data || res.data;
-    if (!categories || categories.length === 0) return;
+        if(newPass !== confPass) {
+            document.getElementById('resetError').style.display = 'block';
+            document.getElementById('resetErrorMsg').textContent = "Passwords do not match!";
+            return;
+        }
 
-    document.getElementById('categoriesGrid').innerHTML = categories.slice(0, 8).map((cat, i) => {
-      const imgUrl   = categoryImages[cat.name];
-      const fallback = fallbackGradients[i % fallbackGradients.length];
+        const token = localStorage.getItem('resetToken');
+        const email = localStorage.getItem('resetEmail');
 
-      return `
-        <a href="shop.html?category_id=${cat.id}" style="
-          border-radius:var(--radius);
-          height:220px;
-          overflow:hidden;
-          position:relative;
-          display:block;
-          text-decoration:none;
-          border:1px solid var(--border-soft);
-          box-shadow:var(--shadow-sm);
-          transition:var(--transition);"
-          onmouseenter="this.querySelector('.cat-overlay').style.opacity='1';this.style.transform='translateY(-4px)';this.style.boxShadow='var(--shadow-md)'"
-          onmouseleave="this.querySelector('.cat-overlay').style.opacity='0';this.style.transform='translateY(0)';this.style.boxShadow='var(--shadow-sm)'">
+        if(!token || !email) {
+            alert('Invalid reset attempt. Please request a new link.');
+            window.location.href = 'forgot-password.html';
+            return;
+        }
 
-          <!-- Image or gradient background -->
-          ${imgUrl
-            ? `<img src="${imgUrl}" alt="${cat.name}"
-                style="width:100%;height:100%;object-fit:cover;display:block;"
-                onerror="this.style.display='none';this.parentElement.style.background='${fallback}'">`
-            : `<div style="width:100%;height:100%;background:${fallback};"></div>`}
+        const res = await fetch('/api/reset-password', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ email, token, password: newPass })
+        });
+        const data = await res.json();
 
-          <!-- Dark overlay -->
-          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,rgba(0,0,0,0.1) 60%,transparent 100%);"></div>
-
-          <!-- Hover overlay -->
-          <div class="cat-overlay" style="position:absolute;inset:0;background:rgba(196,56,107,0.25);opacity:0;transition:opacity 0.3s;"></div>
-
-          <!-- Text -->
-          <div style="position:absolute;bottom:0;left:0;right:0;padding:18px;color:white;">
-            <div style="font-family:'Playfair Display',serif;font-weight:700;font-size:18px;margin-bottom:2px;">${cat.name}</div>
-            <div style="font-size:12px;opacity:0.85;">Shop now →</div>
-          </div>
-        </a>`;
-    }).join('');
-  }
-</script>
+        if(data.ok) {
+            alert('Password reset successful!');
+            localStorage.removeItem('resetToken');
+            localStorage.removeItem('resetEmail');
+            window.location.href = 'login.html';
+        } else {
+            document.getElementById('resetError').style.display = 'block';
+            document.getElementById('resetErrorMsg').textContent = data.message;
+        }
+    }
+  </script>
 </body>
 </html>
