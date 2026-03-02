@@ -1,7 +1,7 @@
 /* CandyCove — app.js */
 
 // ── API Config ──────────────────────────────────
-const API_BASE = 'https://backend-dev-7629.up.railway.app/api';
+const API_BASE = 'https://candycove.up.railway.app/api';
 
 function getToken()     { return localStorage.getItem('cc_token'); }
 function setToken(t)    { localStorage.setItem('cc_token', t); }
