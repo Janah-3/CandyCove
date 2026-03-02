@@ -1,0 +1,5 @@
+{
+    "require": {
+        "jorgecortesdev/sendgrid-laravel": "^1.0"
+    }
+}
